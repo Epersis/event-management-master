@@ -142,7 +142,7 @@ By default, any user signed up will have 1000 in the account wallet.
     }
 }
 
-2. Make the Booking for the event ID 9 which has been created above using the API
+2. Make the Booking for the event ID 4 which has been created above using the API
 
 > POST [**/api/v1/bookings**]
 (http://localhost:8081/api/v1/bookings)
