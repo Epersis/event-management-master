@@ -1,0 +1,89 @@
+.theme-color {
+    color: #4D0015;
+}
+
+.background {
+    background-color: #222222;
+}
+
+.navbar {
+    background-color: #4D0015;
+
+    .nav-item {
+        color: rgb(183, 164, 164);
+
+        &:hover {
+            color: white;
+        }
+
+        &.active {
+            color: white;
+        }
+    }
+
+    .navbar-toggler {
+        color: rgb(183, 164, 164);
+        border-color: rgb(183, 164, 164);
+        background-color: #4D0015;
+
+        &:hover {
+            color: #4D0015;
+            border-color: white;
+            background-color: white;
+        }
+
+        &[aria-expanded="true"] {
+            color: #4D0015;
+            border-color: white;
+            background-color: white;
+        }
+
+        &[aria-expanded="true"] .navbar-toggler-icon {
+            background-image: url("../img/menu-active.png");
+            background-size: 25px 28px;
+            border-color: white;
+            background-color: white;
+        }
+    }
+
+    .navbar-toggler-icon {
+        color: rgb(183, 164, 164);
+        background-image: url("../img/menu.png");
+        background-size: 25px 28px;
+
+        &:hover {
+            background-image: url("../img/menu-active.png");
+            background-size: 25px 28px;
+            border-color: white;
+            background-color: white;
+        }
+
+        &[aria-expanded="true"] {
+            background-image: url("../img/menu-active.png");
+            background-size: 25px 28px;
+            border-color: white;
+            background-color: white;
+        }
+    }
+
+    .btn {
+        color: rgb(183, 164, 164);
+        border-color: rgb(183, 164, 164);
+        background-color: #4D0015;
+
+        &:hover {
+            color: #4D0015;
+            border-color: white;
+            background-color: white;
+        }
+    }
+
+}
+
+.page-header {
+    padding-top: 12rem;
+    padding-bottom: 6rem;
+    background: url(../img/bg.jpg) top right no-repeat;
+    background-size: cover;
+    background-position: center;
+}
