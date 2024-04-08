@@ -67,7 +67,7 @@
                             <span v-if="event.eventState == 'ACTIVE'" class="text-success"> ACTIVE </span>
                             <span v-else class="text-danger"> CANCELLED </span>
                         </p>
-                        <button class="btn rounded-pill w-100 mt-3" @click="viewEvent"> View Event </button>
+                        <button class="btn rounded-pill w-100 mt-3" @click="viewEvent(event.id)"> View Event </button>
                     </div>
 
                 </div>
@@ -82,7 +82,8 @@
 
             data() {
                 return {
-                    events: []
+                    events: [],
+                    eventId: 0
                 }
             },
 
@@ -115,8 +116,9 @@
 
                 },
 
-                viewEvent() {
-                    Window.open()
+                viewEvent(eventId) {
+                    localStorage.setItem("eventId", eventId)
+                    window.location.href = "viewevent.html"
                 }
 
             }, 
