@@ -86,6 +86,13 @@
     background: url(../img/bg.jpg) top right no-repeat;
     background-size: cover;
     background-position: center;
+
+    &.event-header {
+        background: url(../img/seats.jpg) top right no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
 }
 
 .title {
