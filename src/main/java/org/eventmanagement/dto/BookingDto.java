@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
+import java.util.List;
 
 import org.eventmanagement.enums.BookingStatus;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -46,6 +47,16 @@ public class BookingDto implements Serializable {
     private Date createdDateTime;
 
     private Date lastModifiedDateTime;
+
+    private List<TicketDto> tickets;
+
+    public List<TicketDto> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<TicketDto> tickets) {
+        this.tickets = tickets;
+    }
 
     public UUID getBookingId() {
         return bookingId;

@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import org.eventmanagement.dto.EventDto;
 import org.eventmanagement.dto.MessageResponse;
+import org.eventmanagement.enums.EventState;
 import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import java.time.LocalDate;
+import java.time.ZoneId;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import java.util.Date;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
-@RequestMapping("/api/v1/events") 
+@RequestMapping("/api/v1/events")
 @RestController
 public class EventController {
 
@@ -43,11 +49,10 @@ public class EventController {
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Input JSON is invalid."));
         }
-        
+
         Optional<EventDto> savedEventDto = this.eventService.createEvent(eventDto);
         return new ResponseEntity<>(savedEventDto.get(), HttpStatus.CREATED);
-   
-        
+
     }
 
     @GetMapping
@@ -88,7 +93,7 @@ public class EventController {
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public ResponseEntity<?> cancelEvent(@PathVariable long eventId) throws BadRequestException {
         Optional<EventDto> savedEventDto = this.eventService.cancelEvent(eventId);
-        return new ResponseEntity<>(savedEventDto.get(), HttpStatus.OK); 
+        return new ResponseEntity<>(savedEventDto.get(), HttpStatus.OK);
 
     }
 
@@ -100,7 +105,8 @@ public class EventController {
     }
 
     @GetMapping("/{eventId}/revenue")
-    // @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
+    // @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or
+    // hasRole('CUSTOMER')")
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public ResponseEntity<Double> getEventRevenue(@PathVariable Long eventId) {
         Optional<EventDto> eventOptional = eventService.getEventById(eventId);
@@ -115,7 +121,6 @@ public class EventController {
 
         return ResponseEntity.ok(revenue);
 
-        
     }
 
     @GetMapping("/generate-report")
@@ -166,5 +171,27 @@ public class EventController {
         }
     }
 
+    @GetMapping("/{eventId}/check-validity")
+    @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER')")
+    public ResponseEntity<Boolean> checkEventValidity(@PathVariable long eventId) {
+        // Check if the event's date is today's date
+        boolean isEventToday = eventService.isEventDateToday(eventId);
+        return ResponseEntity.ok(isEventToday);
+    }
+
+    @GetMapping("/{eventId}/event-state")
+    @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER')")
+    public ResponseEntity<?> getEventState(@PathVariable long eventId) {
+        Optional<EventDto> eventOptional = eventService.getEventById(eventId);
+        if (eventOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+    
+        EventDto eventDto = eventOptional.get();
+        EventState eventState = eventDto.getEventState();
+    
+        return ResponseEntity.ok(eventState);
+    }
+    
 
 }
