@@ -103,3 +103,15 @@
     text-align: left;
     margin-bottom: 5%;
 }
+
+.btn {
+    color: #4D0015;
+    border-color: #4D0015;
+    background-color: white;
+
+    &:hover {
+        color: white;
+        border-color: #4D0015;
+        background-color: #4D0015;
+    }
+}
