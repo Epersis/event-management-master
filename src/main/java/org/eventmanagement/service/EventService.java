@@ -60,7 +60,6 @@ public class EventService {
         return savedEventDTOPage;
     }
 
-
     public Optional<EventDto> getEventById(long eventId) {
         Optional<Event> savedEvent = this.eventRepository.findById(eventId);
         if (savedEvent.isPresent()) {
@@ -79,6 +78,10 @@ public class EventService {
             savedEvent.get().setAvailableTickets(eventDto.getAvailableTickets());
             savedEvent.get().setTicketPrice(eventDto.getTicketPrice());
             savedEvent.get().setEventDateTime(eventDto.getEventDateTime());
+            
+            // Set the attendance count from the DTO
+            savedEvent.get().setAttendanceCount(eventDto.getAttendanceCount());
+            
             Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
             EventDto savedEventDto = (EventDto) this.objectConverter.convert(updatedSavedEvent, EventDto.class);
             return Optional.of(savedEventDto);

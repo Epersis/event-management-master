@@ -34,6 +34,7 @@ public class Event {
     private EventState eventState;
 
     private String createdBy;
+    private int attendance_count; 
 
     @Basic
     @Generated(GenerationTime.INSERT)
@@ -143,4 +144,13 @@ public class Event {
     public int getTicketsSold() {
         return totalTickets - availableTickets;
     }
+
+    public int getAttendanceCount() {
+        return attendance_count;
+    }
+    
+    public void setAttendanceCount(int attendanceCount) {
+        this.attendance_count = attendanceCount;
+    }
+    
 }

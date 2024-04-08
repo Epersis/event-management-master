@@ -40,6 +40,8 @@ public class EventDto implements Serializable {
 
     private Date lastModifiedDateTime;
 
+    private int attendance_count; 
+
 
     public Long getId() {
         return id;
@@ -140,5 +142,13 @@ public class EventDto implements Serializable {
 
     public int getTicketsSold() {
         return totalTickets - availableTickets;
+    }
+
+    public int getAttendanceCount() {
+        return attendance_count;
+    }
+    
+    public void setAttendanceCount(int attendanceCount) {
+        this.attendance_count = attendanceCount;
     }
 }
