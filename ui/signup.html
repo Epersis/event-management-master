@@ -99,20 +99,29 @@
                         body: JSON.stringify(reqBody)
                     })
                     .then(response => {
-                        console.log(response)
-                        if (response.ok) {
-                            data = response.json()
-                            console.log(data)
-                            if (data.role == "ROLE_CUSTOMER") {
-                                //REDIRECT TO CUSTOMER PAGE
-                            }
-                            else if (data.role == "ROLE_EVENT_MANAGER") {
-                                //REDIRECT TO EVENT MANAGER PAGE
-                            }
-                            else if (data.role == "ROLE_TICKETING_OFFICER") {
-                                //REDIRECT TO TICKETING OFFICER PAGE
-                            }
+                        if (!response.ok) {
+                            console.log("got error")
+                            throw new Error("got error")
                         }
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+                        console.log(data.role)
+                        console.log(data.token)
+
+                        localStorage.setItem('token', data.token)
+
+                        if (data.role == "ROLE_CUSTOMER") {
+                            //REDIRECT TO CUSTOMER PAGE
+                        }
+                        else if (data.role == "ROLE_EVENT_MANAGER") {
+                            //REDIRECT TO EVENT MANAGER PAGE
+                            window.open("eventManager/index.html")
+                        }
+                    })
+                    .catch (error => {
+                        console.logS(error)
                     })
                 }
 
@@ -121,8 +130,7 @@
                 roles() {
                     return {
                         'ROLE_CUSTOMER': "Customer",
-                        'ROLE_EVENT_MANAGER': "Event Manager", 
-                        'ROLE_TICKETING_OFFICER': "Ticketing Officer"}
+                        'ROLE_EVENT_MANAGER': "Event Manager"}
                 }
             }
 
