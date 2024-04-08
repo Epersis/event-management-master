@@ -8,15 +8,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
-import java.io.Serializable;
-import java.util.Date;
-import java.util.UUID;
 
 import org.eventmanagement.dto.PaymentMethod;
 import org.eventmanagement.enums.BookingStatus;
@@ -24,6 +21,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "bookings")
@@ -69,6 +71,10 @@ public class Booking implements Serializable {
             "UPDATE CURRENT_TIMESTAMP")
     private Date lastModifiedDateTime;
 
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Ticket> tickets;
+
+    // Getters and setters
 
     public UUID getBookingId() {
         return bookingId;
@@ -174,6 +180,19 @@ public class Booking implements Serializable {
         this.eventId = eventId;
     }
 
+    public List<Ticket> getTickets() {
+        return tickets;
+    }
+
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
+    }
+
+    public void addTicket(Ticket ticket) {
+        if (tickets == null) {
+            tickets = new ArrayList<>();
+        }
+        tickets.add(ticket);
+        ticket.setBooking(this); // Ensure bidirectional relationship
+    }
 }
-
-

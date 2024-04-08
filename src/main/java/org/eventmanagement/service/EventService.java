@@ -1,5 +1,6 @@
 package org.eventmanagement.service;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +24,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.eventmanagement.exception.EventNotFoundException;
+import java.time.LocalDate;
+import java.util.Date;
+
 @Service
 @Transactional
 public class EventService {
@@ -52,7 +56,6 @@ public class EventService {
         return Optional.of(returnedEvent);
     }
 
-
     public Page<EventDto> getEvents(Pageable pageable) {
         Page<Event> savedEvents = this.eventRepository.findAll(pageable);
         Page<EventDto> savedEventDTOPage = savedEvents.map(s -> (EventDto) this.objectConverter.convert(s,
@@ -78,10 +81,10 @@ public class EventService {
             savedEvent.get().setAvailableTickets(eventDto.getAvailableTickets());
             savedEvent.get().setTicketPrice(eventDto.getTicketPrice());
             savedEvent.get().setEventDateTime(eventDto.getEventDateTime());
-            
+
             // Set the attendance count from the DTO
             savedEvent.get().setAttendanceCount(eventDto.getAttendanceCount());
-            
+
             Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
             EventDto savedEventDto = (EventDto) this.objectConverter.convert(updatedSavedEvent, EventDto.class);
             return Optional.of(savedEventDto);
@@ -125,11 +128,12 @@ public class EventService {
         }
         if (savedEvent.isPresent()) {
             savedEvent.get().setEventState(EventState.CANCELLED);
-            //Initiate the Refunds.
-            List<Booking> activeBookingAssociatedWithEvent =
-                    this.bookingRepository.findAllByEventIdAndBookingStatus(id, BookingStatus.ACCEPTED);
+            // Initiate the Refunds.
+            List<Booking> activeBookingAssociatedWithEvent = this.bookingRepository.findAllByEventIdAndBookingStatus(id,
+                    BookingStatus.ACCEPTED);
             this.bookingService.cancelActiveBookingsIfEventCancelled(activeBookingAssociatedWithEvent,
-                    (BookingEventDetailsDto) this.objectConverter.convert(savedEvent.get(), BookingEventDetailsDto.class));
+                    (BookingEventDetailsDto) this.objectConverter.convert(savedEvent.get(),
+                            BookingEventDetailsDto.class));
             Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
             EventDto savedEventDto = (EventDto) this.objectConverter.convert(updatedSavedEvent, EventDto.class);
             return Optional.of(savedEventDto);
@@ -137,5 +141,34 @@ public class EventService {
         return Optional.empty();
     }
 
+    public boolean isEventDateToday(long eventId) {
+        // Get the current date
+        LocalDate currentDate = LocalDate.now();
+
+        // Get the event from the database
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            Event event = eventOptional.get();
+            Date eventDate = event.getEventDateTime();
+
+            // Convert Date to LocalDate
+            LocalDate eventLocalDate = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+            // Check if the event's date is the same as the current date
+            return currentDate.isEqual(eventLocalDate);
+        } else {
+            throw new EventNotFoundException("Event not found with ID: " + eventId);
+        }
+    }
+
+    public EventState getEventState(long eventId) {
+        Optional<Event> eventOptional = eventRepository.findById(eventId);
+        if (eventOptional.isPresent()) {
+            Event event = eventOptional.get();
+            return event.getEventState();
+        }
+        throw new EventNotFoundException("Event not found with ID: " + eventId);
+    }
+    
 
 }

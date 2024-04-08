@@ -15,18 +15,22 @@ import org.eventmanagement.dto.EventDto;
 import org.eventmanagement.dto.PaymentMethod;
 import org.eventmanagement.dto.TransactionStatus;
 import org.eventmanagement.dto.UserDetailsImpl;
+import org.eventmanagement.dto.TicketDto; 
+import org.eventmanagement.enums.TicketState;
 import org.eventmanagement.enums.BookingStatus;
 import org.eventmanagement.enums.Role;
 import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.exception.EntityDoesNotExistException;
 import org.eventmanagement.model.Booking;
 import org.eventmanagement.model.Event;
+import org.eventmanagement.model.Ticket;
 import org.eventmanagement.model.User;
 import org.eventmanagement.model.Wallet;
 import org.eventmanagement.repository.BookingRepository;
 import org.eventmanagement.repository.EventRepository;
 import org.eventmanagement.repository.UserRepository;
 import org.eventmanagement.repository.WalletRepository;
+import org.eventmanagement.repository.TicketRepository;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -37,6 +41,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -52,6 +58,9 @@ public class BookingService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Autowired
     private ObjectConverter objectConverter;
@@ -97,19 +106,39 @@ public class BookingService {
         Event event =
                 this.eventRepository.findById(bookingDto.getEventId()).orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
         event.setAvailableTickets(event.getAvailableTickets() - bookingDto.getNumberOfTickets());
+        
+        
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
                 BookingEventDetailsDto.class);
         Booking booking = (Booking) this.objectConverter.convert(bookingDto, Booking.class);
+
+        // Create and associate tickets with the booking
+        List<Ticket> tickets = createTicketsForBooking(booking);
+        booking.setTickets(tickets);
+
         booking.getTransactionDetail().setBooking(booking);
         Booking savedBooking = this.bookingRepository.saveAndFlush(booking);
         this.eventRepository.saveAndFlush(event);
         BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
         savedBookingDto.setEventDetails(bookingEventDetailsDto);
+        
         if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
             sendMailOfBooking(savedBookingDto, "Ticket Confirmation", "email-template.ftl");
         }
         return Optional.of(savedBookingDto);
     }
+
+    private List<Ticket> createTicketsForBooking(Booking booking) {
+        List<Ticket> tickets = new ArrayList<>();
+        int numberOfTickets = booking.getNumberOfTickets();
+        for (int i = 0; i < numberOfTickets; i++) {
+            Ticket ticket = new Ticket();
+            ticket.setTicketState(TicketState.INACTIVE);
+            ticket.setBooking(booking);
+            tickets.add(ticketRepository.save(ticket));
+        }
+        return tickets;
+    }    
 
     private static LoggedInUserIdentity getLoggedInUserIdentity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
