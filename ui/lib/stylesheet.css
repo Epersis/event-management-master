@@ -87,3 +87,19 @@
     background-size: cover;
     background-position: center;
 }
+
+.title {
+    font-size: larger;
+    font-weight: bold;
+}
+
+.header {
+    font-size: medium;
+    font-weight: 600;
+    align-self: center
+}
+
+.details {
+    text-align: left;
+    margin-bottom: 5%;
+}
