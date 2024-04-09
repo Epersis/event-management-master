@@ -20,7 +20,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
-<body class="background">
+<body class="background" id="app">
 
     <!-- Nav Bar -->
     <nav class="navbar fixed-top navbar-expand-lg">
@@ -46,15 +46,66 @@
     </nav>
 
     <!-- Page Header -->
-    <div id="app" class="container-fluid page-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
+    <div class="container-fluid page-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
         <div class="container">
             <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Welcome Back, <br> {{ firstName }} {{ lastName }} </h1>
         </div>
     </div>
 
-    <div class="container-xxl">
-        
+    <div class="container-fluid mb-5" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: fit-content; ">
+        <div class="container mb-5">
+            <div class="section-header text-center mx-auto mb-5 wow fadeInUp text-white" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
+                <h1 class="display-5 mb-3 text-white fw-bold text-center">What do you want to do today?</h1>
+            </div>
+
+            <div class="container align-items-center justify-content-center">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 my-2">
+                        <div class="card shadow-sm m-1 w-100 h-100">
+                            <div class="card-body">
+                                <div class="mb-4 title text-center"> View All Events </div>
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('eventManaging/allevents.html')"> Ok </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 my-2">
+                        <div class="card shadow-sm m-1 w-100 h-100">
+                            <div class="card-body">
+                                <div class="mb-4 title text-center"> Add New Event </div>
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('eventManaging/addevent.html')"> Ok </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 my-2">
+                        <div class="card shadow-sm m-1 w-100 h-100">
+                            <div class="card-body">
+                                <div class="mb-4 title text-center"> View All Ticket Officers </div>
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('officerManaging/allofficers.html')"> Ok </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 my-2">
+                        <div class="card shadow-sm m-1 w-100 h-100">
+                            <div class="card-body">
+                                <div class="mb-4 title text-center"> Add New Ticket Officer </div>
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('officerManaging/addofficer.html')"> Ok </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
+
 
     <script>
 
@@ -70,7 +121,7 @@
             },
             
             methods: {
-                fetchCustomers() {
+                fetchUser() {
 
                     token = localStorage.getItem("token")
                     console.log(token)
@@ -96,17 +147,21 @@
                         console.log(error)
                     })
 
+                }, 
+
+                redirect(url) {
+                    console.log("ehcekc")
+                    window.location.href = url
                 }
+
             }, 
 
             created() {
                 console.log("working")
-                this.fetchCustomers();
+                this.fetchUser();
             }
 
-        })
-
-        const vm = app.mount('#app');
+        }).mount("#app")
 
 
     </script>
