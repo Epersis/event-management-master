@@ -34,6 +34,7 @@
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <!-- Chart Rendering Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
     <!-- Nav Bar -->
@@ -159,31 +160,13 @@
                 Event Report                
             </h1>
             <div class="col-3 d-flex justify-content-end align-items-center">
-                <button class="mx-1 btn rounded-pill fs-6 fw-medium"> Generate Report </button>
-                <button class="mx-1 btn rounded-pill fs-6 fw-medium"> 
-                    <a href="sample.pdf" download="test.csv">
-                        test
-                        <!-- instantly downloads LMAO -->
-                        <!-- OH CAN DOWNLOAD AS PDF INTO EXCEL FILE WTF -->
-                    </a>
-                </button>                
+                <button class="mx-1 btn rounded-pill fs-6 fw-medium" @click="generateReport()"> Generate Report </button>            
             </div>
-        </div>
-
-
-        <!-- 
-            - only appear upon pressing generate report + download holy fuck
-            - generate report will fetch the generating of report, csv into pdf file? name as eventname-id
-            - find target file to store the pdfs and rmb to retrieve from there
-        -->
-        <div class="row">
-            <object type="application/pdf" data="sample.pdf" width="600" height="700">
-            </object>
         </div>
 
     </div>
 
-    <script>
+    <script> 
 
         console.log(localStorage.getItem("eventId"))
 
@@ -326,7 +309,49 @@
 
                     fetch()
 
-                }
+                },
+
+                generateReport() {
+
+                    fetch("http://localhost:8081/api/v1/events/generate-report",{
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        }
+                    })
+                    .then(response => {
+                        console.log(response.body)
+                        if (!response.ok) {
+                            throw new Error("error")
+                        }
+                        // console.log(response.json())
+                        return response.text()
+                    })
+                    .then(data => {
+                        console.log(data)
+
+                        manageData = data.split("\n")
+                        eventData = manageData[0] + "\n" + manageData[this.eventId]
+
+                        const blob = new Blob([eventData], { type: 'text/csv;charset=utf-8;' });
+                        const url = window.URL.createObjectURL(blob);
+
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.setAttribute('download', this.eventName + "-" + this.eventId + "_report.csv"); 
+
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+
+                        
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+
+                },
+
+                
 
 
             },
