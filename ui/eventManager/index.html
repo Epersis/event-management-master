@@ -18,6 +18,9 @@
     <link rel="stylesheet" href="../lib/owlcarousel/assets/owl.carousel.min.css">
     <!-- Add Axios Library -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Logout -->
+    <script src="logout.js"></script>
 </head>
 
 <body class="background" id="app">
@@ -39,7 +42,7 @@
                     <a href="index.html" class="nav-item nav-link active">Home</a>
                     <a href="eventManaging/allevents.html" class="nav-item nav-link">Events</a>  
                     <a href="officerManaging/addofficer.html" class="nav-item nav-link">Officers</a>
-                    <a href="../login.html" class="btn mx-2">Logout</a>
+                    <a class="btn mx-2" @click="logout()">Logout</a>
                 </div>
             </div>
         </div>
@@ -142,6 +145,11 @@
                 redirect(url) {
                     console.log("ehcekc")
                     window.location.href = url
+                },
+
+                logout() {
+                    localStorage.removeItem("token")
+                    window.location.href = "../login.html"
                 }
 
             }, 

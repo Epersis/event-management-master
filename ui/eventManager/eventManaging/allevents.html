@@ -41,7 +41,7 @@
                     <a href="../index.html" class="nav-item nav-link">Home</a>
                     <a href="allevents.html" class="nav-item nav-link active">Events</a>  
                     <a href="../officerManaging/addofficer.html" class="nav-item nav-link">Officers</a>
-                    <a href="../../login.html" class="btn mx-2">Logout</a>
+                    <a @click="logout()" class="btn mx-2">Logout</a>
                 </div>
             </div>
         </div>
@@ -133,6 +133,11 @@
 
                 addEvent() {
                     window.location.href = "addevent.html"
+                },
+
+                logout() {
+                    localStorage.removeItem("token")
+                    window.location.href = "../../login.html"
                 }
 
             }, 
