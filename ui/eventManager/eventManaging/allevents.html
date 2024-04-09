@@ -58,7 +58,7 @@
         <div class="container mb-5">
             <div class="section-header text-center mx-auto mb-5 wow fadeInUp text-white" data-wow-delay="0.1s" style="max-width: 500px; visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
                 <h1 class="display-5 mb-3 text-white fw-bold text-center">All Events</h1>
-                <button @click="addEvent()" class="btn rounded-pill"> Add Event </button>
+                <button @click="addEvent()" class="btn neg-btn rounded-pill"> Add Event </button>
             </div>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 justify-content-start wow fadeInUp justify-content-around" data-wow-delay="0.1s" id="randomRecipes" >
                 <div class="card shadow-sm m-1 h-100" v-if="events.length > 0">
@@ -75,7 +75,7 @@
                             <span v-if="event.eventState == 'ACTIVE'" class="text-success"> ACTIVE </span>
                             <span v-else class="text-danger"> CANCELLED </span>
                         </p>
-                        <button class="btn rounded-pill w-100 mt-3" @click="viewEvent(event.id)"> View Event </button>
+                        <button class="btn neg-btn rounded-pill w-100 mt-3" @click="viewEvent(event.id)"> View Event </button>
                     </div>
 
                 </div>

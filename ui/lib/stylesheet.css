@@ -121,6 +121,18 @@
         border-color: #4D0015;
         background-color: #4D0015;
     }
+
+    &.neg-btn {
+        color: white;
+        border-color: #4D0015;
+        background-color: #4D0015;
+    
+        &:hover {
+            color: #4D0015;
+            border-color: #4D0015;
+            background-color: white;
+        }
+    }
 }
 
 .event-details {
