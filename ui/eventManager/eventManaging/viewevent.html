@@ -107,18 +107,48 @@
     <!-- Deets -->
     <div class="container-fluid mx-1 mb-5 px-4">
         <div class="section-header mx-2 mb-5 wow fadeInUp text-white" data-wow-delay="0.1s" style="max-width: 500px; visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
-            <h1 class="display-5 mb-3 text-white fw-bold">Event Details</h1>
+            <h1 class="display-5 mb-3 text-white fw-bold">
+                Event Details
+                <button class="col-4 mx-1 btn rounded-pill"> Update Event </button>
+            </h1>
+            
         </div>
 
-        <div class="event-details mx-2 mb-5">
-            <p class="mb-4 title"> {{ eventName }} </p>
-            <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p>
-            <p class="details mb-1"> <span class="header"> Venue :</span> {{ venue }} </p> 
-            <p class="details mb-1"> <span class="header"> Date & Time :</span> {{ dateTime }} </p> 
-            <p class="details mb-1" v-for="text, key in eventTypes">
-                <span v-if="eventType == key"> <span class="header"> Event Type :</span> {{ text }} </span>
-            </p>  
-            <p class="details mb-1"> <span class="header"> Event State :</span> {{ eventState }} </p> 
+        <div class="event-details mx-2 mb-5 row">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> About </p> 
+                <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p>
+                <p class="details mb-1"> <span class="header"> Venue :</span> {{ venue }} </p> 
+                <p class="details mb-1"> <span class="header"> Date & Time :</span> {{ dateTime }} </p> 
+                <p class="details mb-1" v-for="text, key in eventTypes">
+                    <span v-if="eventType == key"> <span class="header"> Event Type :</span> {{ text }} </span>
+                </p>  
+                <p class="details mb-1"> <span class="header"> Event State : </span> 
+                    <span v-if="eventState == 'ACTIVE'" class="text-success fw-bold"> ACTIVE </span>
+                    <span v-else class="text-danger fw-bold"> CANCELLED </span>
+                </p>
+                <br>
+                <br>
+                <div class="row">
+                    
+                    <button class="col-4 mx-1 btn neg-btn rounded-pill"> Cancel Event </button>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> Tickets </p>
+                <p class="details mb-1"> <span class="header"> Total Tickets :</span> {{ totalTickets }} </p>
+                <p class="details mb-1"> <span class="header"> Tickets Sold :</span> {{ ticketsSold }} </p> 
+                <p class="details mb-1"> <span class="header"> Tickets Left :</span> {{ ticketsLeft }} </p>
+                <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice }} </p>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> Creation </p>
+                <p class="details mb-1"> <span class="header"> Created :</span> {{ created }} </p> 
+                <p class="details mb-1"> <span class="header"> Last Modified :</span> {{ lastMod }} </p> 
+                <p class="details mb-1"> <span class="header"> Creator :</span> {{ creator }} </p> 
+            </div>
+             
+               
         </div>
 
     </div>
@@ -192,12 +222,34 @@
                         else {
                             time = dateTimeRaw.substring(11, 16) + " am"
                         }
-
                         this.dateTime = date + " | " + time
 
-                        // this.dateTime = 
-                        // this.created =
-                        // this.lastMod = 
+                        createdRaw = data.createdDateTime
+                        dateC = createdRaw.substring(0, 10)
+                        if (createdRaw.substring(11, 13) >= 12) {
+                            timeC = (createdRaw.substring(11, 13) - 12) + createdRaw.substring(13, 16) + " pm"
+                        }
+                        else if (createdRaw.substring(11, 13) == 0) {
+                            timeC = "12" + createdRaw.substring(13, 16) + " pm"
+                        }
+                        else {
+                            timeC = createdRaw.substring(11, 16) + " am"
+                        }
+                        this.created = dateC + " | " + timeC
+
+                        modifiedRaw = data.lastModifiedDateTime
+                        dateM = modifiedRaw.substring(0, 10)
+                        if (modifiedRaw.substring(11, 13) >= 12) {
+                            timeM = (modifiedRaw.substring(11, 13) - 12) + modifiedRaw.substring(13, 16) + " pm"
+                        }
+                        else if (modifiedRaw.substring(11, 13) == 0) {
+                            timeM = "12" + modifiedRaw.substring(13, 16) + " pm"
+                        }
+                        else {
+                            timeM = modifiedRaw.substring(11, 16) + " am"
+                        }
+                        this.lastMod = dateM + " | " + timeM
+
                         this.creator = data.createdBy
                         console.log(this.ticketsSold)
                         console.log(this.ticketsLeft)
