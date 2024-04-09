@@ -147,12 +147,41 @@
                
         </div>
         <div class="row mx-2 mb-5 justify-content-center">
-            <button class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-auto fs-6 fw-medium px-4"> Cancel Event </button>
+            <button class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-6 fw-medium px-4"> Cancel Event </button>
         </div>
         
-
     </div>
 
+    <!-- Generate Report -->
+    <div class="container-fluid mx-1 mb-5 px-4">
+        <div class="section-header mx-2 mb-5 wow fadeInUp text-white row" data-wow-delay="0.1s" style=" visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
+            <h1 class="display-5 mb-3 text-white fw-bold col-9">
+                Event Report                
+            </h1>
+            <div class="col-3 d-flex justify-content-end align-items-center">
+                <button class="mx-1 btn rounded-pill fs-6 fw-medium"> Generate Report </button>
+                <button class="mx-1 btn rounded-pill fs-6 fw-medium"> 
+                    <a href="sample.pdf" download="test.csv">
+                        test
+                        <!-- instantly downloads LMAO -->
+                        <!-- OH CAN DOWNLOAD AS PDF INTO EXCEL FILE WTF -->
+                    </a>
+                </button>                
+            </div>
+        </div>
+
+
+        <!-- 
+            - only appear upon pressing generate report + download holy fuck
+            - generate report will fetch the generating of report, csv into pdf file? name as eventname-id
+            - find target file to store the pdfs and rmb to retrieve from there
+        -->
+        <div class="row">
+            <object type="application/pdf" data="sample.pdf" width="600" height="700">
+            </object>
+        </div>
+
+    </div>
 
     <script>
 
