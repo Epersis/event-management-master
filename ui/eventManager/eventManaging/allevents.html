@@ -138,11 +138,19 @@
                 logout() {
                     localStorage.removeItem("token")
                     window.location.href = "../../login.html"
+                },
+
+                checkLogin() {
+                    if (!localStorage.getItem("token")) {
+                        window.location.href = "../../login.html"
+                        alert("Please login")
+                    }
                 }
 
             }, 
 
             created() {
+                this.checkLogin()
                 console.log("here")
                 this.fetchEvents()
             }

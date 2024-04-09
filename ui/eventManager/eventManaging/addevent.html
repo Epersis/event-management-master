@@ -189,6 +189,13 @@
                 logout() {
                     localStorage.removeItem("token")
                     window.location.href = "../../login.html"
+                },
+
+                checkLogin() {
+                    if (!localStorage.getItem("token")) {
+                        window.location.href = "../../login.html"
+                        alert("Please login")
+                    }
                 }
 
             },
@@ -202,6 +209,10 @@
                         "OTHER" : "Other"
                     }
                 }
+            },
+
+            created() {
+                this.checkLogin()
             }
 
         }).mount("#app")
