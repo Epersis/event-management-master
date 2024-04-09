@@ -88,11 +88,11 @@
                         else if (data.role == "ROLE_EVENT_MANAGER") {
                             //REDIRECT TO EVENT MANAGER PAGE
                             console.log(localStorage)
-                            window.open("eventManager/index.html")
+                            window.location.href = "eventManager/index.html"
                         }
                         else if (data.role == "ROLE_TICKET_OFFICER") {
                             //REDIRECT TO TICKETING OFFICER PAGE
-                            window.open("ticketOfficer/ticketOfficer.html")
+                            window.location.href = "ticketOfficer/ticketOfficer.html"
                         }
                     })
                     .catch (error => {
