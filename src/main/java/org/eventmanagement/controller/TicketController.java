@@ -17,6 +17,8 @@ import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.exception.EntityDoesNotExistException;
 import org.eventmanagement.controller.EventController;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/v1/tickets")
 public class TicketController {
@@ -39,12 +41,27 @@ public class TicketController {
     }
 
     // changes the state of a ticket to ACTIVE to denote admission of the ticket
+    // @PutMapping("/admit/{ticketId}")
+    // @PreAuthorize("hasRole('TICKET_OFFICER')")
+    // public ResponseEntity<?> admitTicket(@PathVariable long ticketId) {
+    //     try {
+    //         ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
+    //         return ResponseEntity.ok().build();
+    //     } catch (EntityDoesNotExistException e) {
+    //         return ResponseEntity.notFound().build();
+    //     } catch (BadRequestException e) {
+    //         return ResponseEntity.badRequest().body(e.getMessage());
+    //     } catch (Exception e) {
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    //     }
+    // }
+
     @PutMapping("/admit/{ticketId}")
     @PreAuthorize("hasRole('TICKET_OFFICER')")
     public ResponseEntity<?> admitTicket(@PathVariable long ticketId) {
         try {
             ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("Ticket with id " + ticketId + " has been admitted. Ticket status: " + TicketState.ACTIVE);
         } catch (EntityDoesNotExistException e) {
             return ResponseEntity.notFound().build();
         } catch (BadRequestException e) {
@@ -53,9 +70,5 @@ public class TicketController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    
-
-
 
 }

@@ -12,6 +12,8 @@ import jakarta.persistence.Table;
 
 import org.eventmanagement.enums.TicketState;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "tickets")
 public class Ticket {
@@ -57,6 +59,10 @@ public class Ticket {
         if (booking != null) {
             booking.addTicket(this);
         }
+    }
+
+    public UUID getBookingId() {
+        return this.booking.getBookingId();
     }
     
 }

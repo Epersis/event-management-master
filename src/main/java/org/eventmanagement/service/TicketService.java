@@ -50,6 +50,9 @@ public class TicketService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    @Autowired
+    private EventRepository eventRepository;
+
     public Page<TicketDto> getTickets(Pageable pageable) {
         Page<Ticket> ticketsPage = ticketRepository.findAll(pageable);
         return ticketsPage.map(ticket -> (TicketDto) objectConverter.convert(ticket, TicketDto.class));
@@ -73,16 +76,48 @@ public class TicketService {
     }
 
     
+    // public void changeTicketState(long ticketId, TicketState newState) throws EntityDoesNotExistException, BadRequestException {
+    //     Ticket ticket = ticketRepository.findById(ticketId)
+    //             .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
+
+    //     if (newState == TicketState.ACTIVE) {
+    //         ticket.setTicketState(TicketState.ACTIVE);
+    //         ticketRepository.save(ticket);
+    //     } else {
+    //         throw new BadRequestException("Invalid ticket state provided for admission.");
+    //     }
+    // }
+
     public void changeTicketState(long ticketId, TicketState newState) throws EntityDoesNotExistException, BadRequestException {
         Ticket ticket = ticketRepository.findById(ticketId)
                 .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
 
         if (newState == TicketState.ACTIVE) {
+            if (ticket.getTicketState() == TicketState.ACTIVE) {
+                throw new BadRequestException("Ticket has already been admitted.");
+            }
             ticket.setTicketState(TicketState.ACTIVE);
+            incrementEventAttendanceCount(ticketId);
             ticketRepository.save(ticket);
         } else {
             throw new BadRequestException("Invalid ticket state provided for admission.");
         }
+    }
+
+    public void incrementEventAttendanceCount(long ticketId) throws EntityDoesNotExistException {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
+    
+        UUID bookingId = ticket.getBookingId();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Booking with id " + bookingId + " does not exist"));
+    
+        Long eventId = booking.getEventId();
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Event with id " + eventId + " does not exist"));
+    
+        event.setAttendanceCount(event.getAttendanceCount() + 1);
+        eventRepository.save(event);
     }
 
 
