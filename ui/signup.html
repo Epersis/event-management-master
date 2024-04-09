@@ -108,21 +108,89 @@
                     .then(data => {
                         console.log(data)
                         console.log(data.role)
-                        console.log(data.token)
 
-                        // localStorage.setItem('token', data.token)
-                        // fetch token
+                        const reqBody2 = {
+                            email: this.email, 
+                            password: this.password
+                        }
 
-                        if (data.role == "ROLE_CUSTOMER") {
-                            //REDIRECT TO CUSTOMER PAGE
-                        }
-                        else if (data.role == "ROLE_EVENT_MANAGER") {
-                            //REDIRECT TO EVENT MANAGER PAGE
-                            window.open("eventManager/index.html")
-                        }
+                        console.log(reqBody2)
+
+                        fetch("http://localhost:8081/api/v1/auth/signin", {
+                            method: 'POST', 
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }, 
+                            body: JSON.stringify(reqBody2)
+                        })
+                        .then(response => {
+                            console.log(response)
+
+                            if (!response.ok) {
+                                console.log("got error")
+                                throw new Error("got error")
+                            }
+                            return response.json()
+                        })
+                        .then(data => {
+                            console.log(data)
+                            console.log(data.role)
+                            console.log(data.token)
+
+                            // localStorage.setItem('token', data.token)
+                            // fetch token
+
+                            if (data.role == "ROLE_CUSTOMER") {
+                                //REDIRECT TO CUSTOMER PAGE
+                            }
+                            else if (data.role == "ROLE_EVENT_MANAGER") {
+                                //REDIRECT TO EVENT MANAGER PAGE
+                                window.open("eventManager/index.html")
+                            }
+
+                        })
+                        .catch (error => {
+                            console.log(error)
+                        })
+
+                        
                     })
                     .catch (error => {
-                        console.logS(error)
+                        console.log(error)
+                    })
+                },
+
+                fetchLogin() {
+                    const reqBody = {
+                        email: this.email, 
+                        password: this.password
+                    }
+
+                    console.log(reqBody)
+
+                    fetch("http://localhost:8081/api/v1/auth/signin", {
+                        method: 'POST', 
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }, 
+                        body: JSON.stringify(reqBody)
+                    })
+                    .then(response => {
+                        console.log(response)
+
+                        if (!response.ok) {
+                            console.log("got error")
+                            throw new Error("got error")
+                        }
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+                        console.log(data.role)
+                        console.log(data.token)
+                    })
+                    .catch (error => {
+                        console.log(error)
                     })
                 }
 
