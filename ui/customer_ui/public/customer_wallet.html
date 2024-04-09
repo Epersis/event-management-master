@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
+     <!-- Bootstrap 5.0 -->
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+     <!-- Font Awesome 5 CDN -->
+     <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" integrity="sha384-rOA1PnstxnOBLzCLMcre8ybwbTmemjzdNlILg8O7z1lUkLXozs4DHonlDtnE7fpc" crossorigin="anonymous"></script>
+     <!-- Axios -->
+     <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+     
+</head>
+<body>
+    <div>
+        
+    </div>
+    <div id="app" class="container-fluid ">
+        <div>
+            <div class="row">
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="container-fluid m-2">
+                      <a class="navbar-brand" href="home.html" style="font-size: 30px; margin-left: 15px;">Event Master</a>
+                      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                      </button>
+                      <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+                        <ul class="navbar-nav">
+                          <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="customer_home.html">Home</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" href="customer_booking.html">My Booking</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link active" href="customer_wallet.html">My Wallet</a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link" v-on:click="logout()" href="#">Logout</a>
+                          </li>
+                        </ul>
+                      </div>
+                </div>
+        </div>
+        <div class="container mt-5 justify-content-center">
+            <div class="row">
+                <div class="col-3"></div>
+                <div class="col-6">
+                    <h1 class="mb-4">Top Up Wallet Balance</h1>
+                    <p>Current Wallet Balance: ${{walletBalance}}</p>
+                    <form id="payment-form">
+                    <div class="form-group">
+                        <label for="amount">Amount to Top Up (SGD):</label>
+                        <select id="amount" class="form-select" aria-label="Default select example" v-model="amount">
+                            <option selected value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="200">200</option>
+                            <option value="300">300</option>
+                            <option value="400">400</option>
+                          </select>
+                    </div>
+                    <div id="card-errors" role="alert" class="text-danger"></div>
+                    <button @click="proceed_to_payment()" type="button" class="btn btn-warning mt-3">Proceed to Payment</button>
+                    </form>
+                </div>
+                <div class="col-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const app = Vue.createApp({
+            created() {
+                this.getUserInfo();
+            },
+
+            data() {
+                return {
+                    amount: 50,
+                    walletBalance: 0,
+                };
+            },
+            methods: {
+                logout() {  
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                },
+
+                getUserInfo() {
+                    const URL = "http://localhost:8081/api/v1/users/profile";
+
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
+
+                    fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.walletBalance = data.walletDetails.balance
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        // Rethrow the error to be handled by the caller
+                        throw error;
+                    });
+                },
+
+                proceed_to_payment() {
+                    console.log("Payment Running!")
+                    let topup_amount = this.amount;
+                    localStorage.setItem('payment_type', 'topup');
+                    localStorage.setItem('topup_amount', JSON.stringify(topup_amount));
+
+                    fetch('/one-time-payment', {
+                        method: 'post',
+                        headers: new Headers({'Content-Type': 'application/Json'}),
+                        body: JSON.stringify({
+                            total_amount: topup_amount,
+                        })
+                    })
+                    .then((res) => res.json())
+                    .then((url) => {
+                        location.href = url;
+                    })
+                    .catch((err) => console.log(err));
+                },    
+            }
+        });
+
+        app.mount('#app');
+    </script>
+</body>
+</html>

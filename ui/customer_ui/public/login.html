@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Form</title>
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="app" class="container mt-5">
+    <h1>Login</h1>
+    <form @submit.prevent="login">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" class="form-control" id="username" v-model="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" class="form-control" id="password" v-model="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <hr>
+        <button class="btn btn-link"><a href="signup.html">Switch to Signup</a></button>
+    <div v-if="errorMessage" class="mt-3 alert alert-danger" role="alert">
+        {{ errorMessage }}
+    </div>
+    <div v-if="successMessage" class="mt-3 alert alert-success" role="alert">
+        {{ successMessage }}
+    </div>
+    
+</div>
+
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                username: '',
+                password: '',
+                errorMessage: '',
+                successMessage: ''
+            };
+        },
+        methods: {
+            login() {
+                // Create a JSON object with username and password
+                const userData = {
+                    email: this.username,
+                    password: this.password
+                };
+
+                // Make a POST request with JSON body
+                fetch(`http://localhost:8081/api/v1/auth/signin`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data['role'] === "ROLE_CUSTOMER") {
+                        this.errorMessage = '';
+                        this.successMessage = 'Login successful! Redirecting...';
+                        const customer_token = data['token'];
+                        localStorage.setItem('customer_token', customer_token)
+                        console.log(customer_token);
+                        window.location.href = "customer_home.html"
+                        
+                    } 
+                    else if (data['role'] === "ROLE_EVENT_MANAGER") {
+                        this.errorMessage = '';
+                        this.successMessage = 'Login successful! Redirecting...';
+                        const user_token = data['token'];
+                    }
+                    else if (data['role'] === "ROLE_TICKET_OFFICER") {
+                        this.errorMessage = '';
+                        this.successMessage = 'Login successful! Redirecting...';
+                        const user_token = data['token'];
+                    }
+                    else {
+                        this.successMessage = '';
+                        this.errorMessage = 'Invalid username or password';
+                    }
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    this.errorMessage = 'An error occurred while processing your request';
+                });
+            }
+        }
+    });
+
+    app.mount('#app');  
+</script>
+
+</body>
+</html>
