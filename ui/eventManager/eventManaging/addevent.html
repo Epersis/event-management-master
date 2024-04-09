@@ -106,7 +106,7 @@
             </div>
             <div class="mb-3 col-md-6">
                 <label for="venue" class="form-label">Venue</label>
-                <input type="number" class="form-control" id="venue" v-model="venue" required>
+                <input type="text" class="form-control" id="venue" v-model="venue" required>
             </div>
             <div class="mb-3 col-md-3">
                 <p> Event Type </p>
@@ -149,6 +149,9 @@
                     console.log(this.eventDateTime)
                     console.log(this.eventType)
 
+                    token = localStorage.getItem("token")
+                    console.log(token)
+
                     dataInput = {
                         "name": this.eventName,
                         "venue": this.venue,
@@ -160,8 +163,30 @@
                         "eventState": "ACTIVE"
                     }
 
-                    fetch()
+                    console.log(dataInput)
 
+                    fetch("http://localhost:8081/api/v1/events", {
+                        method: "POST",
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(dataInput)
+                    })
+                    .then(response => {
+                        console.log(response)
+                        
+                        if (!response.ok) {
+                                console.log("got error")
+                                throw new Error("got error")
+                            }
+                            return response.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+                    })
+                    .catch (error => {
+                        console.log(error)
+                    })
                 }
 
             },
