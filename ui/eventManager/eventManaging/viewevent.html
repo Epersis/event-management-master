@@ -118,6 +118,10 @@
             <p class="details mb-1" v-for="text, key in eventTypes">
                 <span v-if="eventType == key"> <span class="header"> Event Type :</span> {{ text }} </span>
             </p>  
+            <p class="details mb-1"> <span class="header"> Created :</span> {{ created }} </p> 
+            <p class="details mb-1"> <span class="header"> Last Modified :</span> {{ lastMod }} </p> 
+            <p class="details mb-1"> <span class="header"> Creator :</span> {{ creator }} </p> 
+            <p class="details mb-1"> <span class="header"> Event State :</span> {{ eventState }} </p> 
             <p class="details mb-1"> <span class="header"> Event State :</span> {{ eventState }} </p> 
         </div>
 
@@ -192,12 +196,34 @@
                         else {
                             time = dateTimeRaw.substring(11, 16) + " am"
                         }
-
                         this.dateTime = date + " | " + time
 
-                        // this.dateTime = 
-                        // this.created =
-                        // this.lastMod = 
+                        createdRaw = data.createdDateTime
+                        dateC = createdRaw.substring(0, 10)
+                        if (createdRaw.substring(11, 13) >= 12) {
+                            timeC = (createdRaw.substring(11, 13) - 12) + createdRaw.substring(13, 16) + " pm"
+                        }
+                        else if (createdRaw.substring(11, 13) == 0) {
+                            timeC = "12" + createdRaw.substring(13, 16) + " pm"
+                        }
+                        else {
+                            timeC = createdRaw.substring(11, 16) + " am"
+                        }
+                        this.created = dateC + " | " + timeC
+
+                        modifiedRaw = data.lastModifiedDateTime
+                        dateM = modifiedRaw.substring(0, 10)
+                        if (modifiedRaw.substring(11, 13) >= 12) {
+                            timeM = (modifiedRaw.substring(11, 13) - 12) + modifiedRaw.substring(13, 16) + " pm"
+                        }
+                        else if (modifiedRaw.substring(11, 13) == 0) {
+                            timeM = "12" + modifiedRaw.substring(13, 16) + " pm"
+                        }
+                        else {
+                            timeM = modifiedRaw.substring(11, 16) + " am"
+                        }
+                        this.lastMod = dateM + " | " + timeM
+
                         this.creator = data.createdBy
                         console.log(this.ticketsSold)
                         console.log(this.ticketsLeft)
