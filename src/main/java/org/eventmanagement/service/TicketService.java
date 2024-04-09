@@ -2,6 +2,7 @@ package org.eventmanagement.service;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.eventmanagement.exception.EventNotFoundException;
 import org.eventmanagement.exception.BadRequestException;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 
 @Service
@@ -120,5 +123,11 @@ public class TicketService {
         eventRepository.save(event);
     }
 
+    public List<TicketDto> getTicketsByBookingId(UUID bookingId) {
+        List<Ticket> tickets = ticketRepository.findByBookingBookingId(bookingId);
+        return tickets.stream()
+                .map(ticket -> (TicketDto) objectConverter.convert(ticket, TicketDto.class))
+                .collect(Collectors.toList());
+    }
 
 }

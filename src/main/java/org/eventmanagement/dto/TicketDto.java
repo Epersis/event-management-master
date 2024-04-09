@@ -37,4 +37,6 @@ public class TicketDto {
     public void setBookingId(UUID bookingId) { // Add this method
         this.bookingId = bookingId;
     }
+
+
 }

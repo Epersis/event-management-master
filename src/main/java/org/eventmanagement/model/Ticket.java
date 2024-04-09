@@ -64,5 +64,5 @@ public class Ticket {
     public UUID getBookingId() {
         return this.booking.getBookingId();
     }
-    
+
 }
