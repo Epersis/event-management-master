@@ -123,54 +123,104 @@ public class EventController {
 
     }
 
+    // @GetMapping("/generate-report")
+    // @PreAuthorize("hasRole('EVENT_MANAGER')")
+    // public ResponseEntity<byte[]> generateReport() {
+    //     try {
+    //         // Fetch all events
+    //         // Page<EventDto> eventsPage = eventService.getEvents(Pageable.unpaged());
+    //         // List<EventDto> events = eventsPage.getContent();
+    //         List<EventDto> events = eventService.getEvents();
+
+    //         // Initialize variables to hold total ticket sales and revenue
+    //         int totalTicketsSold = 0;
+    //         double totalRevenue = 0.0;
+
+    //         // Initialize StringBuilder to store CSV content
+    //         StringBuilder csvContent = new StringBuilder();
+    //         csvContent.append("Event Name,Total Tickets Sold,Total Revenue\n");
+
+    //         // Iterate over each event to calculate revenue and append to CSV content
+    //         for (EventDto event : events) {
+    //             // Fetch revenue for the current event
+    //             ResponseEntity<Double> revenueResponse = getEventRevenue(event.getId());
+    //             if (revenueResponse.getStatusCode() == HttpStatus.OK) {
+    //                 double revenue = revenueResponse.getBody();
+    //                 int ticketsSold = event.getTicketsSold();
+    //                 totalTicketsSold += ticketsSold;
+    //                 totalRevenue += revenue;
+    //                 csvContent.append(String.format("%s,%d,%.2f\n", event.getName(), ticketsSold, revenue));
+    //             }
+    //         }
+
+    //         // Append total ticket sales and revenue to the CSV content
+    //         csvContent.append(String.format("Total,%d,%.2f\n", totalTicketsSold, totalRevenue));
+
+    //         // Convert CSV content to byte array
+    //         byte[] csvBytes = csvContent.toString().getBytes();
+
+    //         // Set response headers
+    //         HttpHeaders headers = new HttpHeaders();
+    //         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+    //         headers.setContentDispositionFormData("filename", "event_report.csv");
+
+    //         // Return CSV data as response
+    //         return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
+    //     } catch (Exception e) {
+    //         // Handle exceptions
+    //         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+    //     }
+    // }
+
     @GetMapping("/generate-report")
-    @PreAuthorize("hasRole('EVENT_MANAGER')")
-    public ResponseEntity<byte[]> generateReport() {
-        try {
-            // Fetch all events
-            // Page<EventDto> eventsPage = eventService.getEvents(Pageable.unpaged());
-            // List<EventDto> events = eventsPage.getContent();
-            List<EventDto> events = eventService.getEvents();
+@PreAuthorize("hasRole('EVENT_MANAGER')")
+public ResponseEntity<byte[]> generateReport() {
+    try {
+        // Fetch all events
+        List<EventDto> events = eventService.getEvents();
 
-            // Initialize variables to hold total ticket sales and revenue
-            int totalTicketsSold = 0;
-            double totalRevenue = 0.0;
+        // Initialize variables to hold total ticket sales, revenue, and attendance count
+        int totalTicketsSold = 0;
+        double totalRevenue = 0.0;
+        int totalAttendanceCount = 0;
 
-            // Initialize StringBuilder to store CSV content
-            StringBuilder csvContent = new StringBuilder();
-            csvContent.append("Event Name,Total Tickets Sold,Total Revenue\n");
+        // Initialize StringBuilder to store CSV content
+        StringBuilder csvContent = new StringBuilder();
+        csvContent.append("Event Name,Total Tickets Sold,Total Revenue,Total Attendance Count\n");
 
-            // Iterate over each event to calculate revenue and append to CSV content
-            for (EventDto event : events) {
-                // Fetch revenue for the current event
-                ResponseEntity<Double> revenueResponse = getEventRevenue(event.getId());
-                if (revenueResponse.getStatusCode() == HttpStatus.OK) {
-                    double revenue = revenueResponse.getBody();
-                    int ticketsSold = event.getTicketsSold();
-                    totalTicketsSold += ticketsSold;
-                    totalRevenue += revenue;
-                    csvContent.append(String.format("%s,%d,%.2f\n", event.getName(), ticketsSold, revenue));
-                }
+        // Iterate over each event to calculate revenue and attendance count, and append to CSV content
+        for (EventDto event : events) {
+            // Fetch revenue for the current event
+            ResponseEntity<Double> revenueResponse = getEventRevenue(event.getId());
+            if (revenueResponse.getStatusCode() == HttpStatus.OK) {
+                double revenue = revenueResponse.getBody();
+                int ticketsSold = event.getTicketsSold();
+                totalTicketsSold += ticketsSold;
+                totalRevenue += revenue;
+                totalAttendanceCount += event.getAttendanceCount();
+                csvContent.append(String.format("%s,%d,%.2f,%d\n", event.getName(), ticketsSold, revenue, event.getAttendanceCount()));
             }
-
-            // Append total ticket sales and revenue to the CSV content
-            csvContent.append(String.format("Total,%d,%.2f\n", totalTicketsSold, totalRevenue));
-
-            // Convert CSV content to byte array
-            byte[] csvBytes = csvContent.toString().getBytes();
-
-            // Set response headers
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("filename", "event_report.csv");
-
-            // Return CSV data as response
-            return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
-        } catch (Exception e) {
-            // Handle exceptions
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+
+        // Append total ticket sales, revenue, and attendance count to the CSV content
+        csvContent.append(String.format("Total,%d,%.2f,%d\n", totalTicketsSold, totalRevenue, totalAttendanceCount));
+
+        // Convert CSV content to byte array
+        byte[] csvBytes = csvContent.toString().getBytes();
+
+        // Set response headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("filename", "event_report.csv");
+
+        // Return CSV data as response
+        return new ResponseEntity<>(csvBytes, headers, HttpStatus.OK);
+    } catch (Exception e) {
+        // Handle exceptions
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
+}
+
 
     @GetMapping("/{eventId}/check-validity")
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER')")
