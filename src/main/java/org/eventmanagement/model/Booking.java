@@ -60,6 +60,8 @@ public class Booking implements Serializable {
 
     private long eventId;
 
+    private double cancellationFee;
+
     @Basic
     @CreationTimestamp
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
@@ -194,5 +196,13 @@ public class Booking implements Serializable {
         }
         tickets.add(ticket);
         ticket.setBooking(this); // Ensure bidirectional relationship
+    }
+
+    public double getCancellationFee() {
+        return cancellationFee;
+    }
+
+    public void setCancellationFee(double cancellationFee) {
+        this.cancellationFee = cancellationFee;
     }
 }
