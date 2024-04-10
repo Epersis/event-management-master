@@ -52,6 +52,8 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/v1/events/**").permitAll()
                                 .requestMatchers("/api/v1/bookings/**").permitAll()
                                 .requestMatchers("/api/v1/users/**").permitAll()
+                                .requestMatchers("api/v1/wallet/**").permitAll()
+                                .requestMatchers("/api/v1/tickets/**").permitAll()	
                                 .anyRequest().authenticated()
                 );
 
