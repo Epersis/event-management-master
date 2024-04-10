@@ -49,6 +49,8 @@ public class BookingDto implements Serializable {
     private Date lastModifiedDateTime;
 
     private List<TicketDto> tickets;
+    
+    private double cancellationFee;
 
     public List<TicketDto> getTickets() {
         return tickets;
@@ -161,5 +163,13 @@ public class BookingDto implements Serializable {
 
     public void setLastModifiedDateTime(Date lastModifiedDateTime) {
         this.lastModifiedDateTime = lastModifiedDateTime;
+    }
+    
+    public double getCancellationFee() {
+        return cancellationFee;
+    }
+
+    public void setCancellationFee(double cancellationFee) {
+        this.cancellationFee = cancellationFee;
     }
 }
