@@ -78,11 +78,12 @@ public class EventService {
         Optional<Event> savedEvent = this.eventRepository.findById(id);
         if (savedEvent.isPresent()) {
             savedEvent.get().setName(eventDto.getName());
-            savedEvent.get().setVenue(eventDto.getName());
+            savedEvent.get().setVenue(eventDto.getVenue());
             savedEvent.get().setEventType(eventDto.getEventType());
             savedEvent.get().setAvailableTickets(eventDto.getAvailableTickets());
             savedEvent.get().setTicketPrice(eventDto.getTicketPrice());
             savedEvent.get().setEventDateTime(eventDto.getEventDateTime());
+            savedEvent.get().setTotalTickets(eventDto.getTotalTickets());
 
             // Set the attendance count from the DTO
             savedEvent.get().setAttendanceCount(eventDto.getAttendanceCount());
