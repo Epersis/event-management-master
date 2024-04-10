@@ -74,12 +74,7 @@ public class EventDto implements Serializable {
     }
 
     public void setEventState(EventState eventState) {
-        if (this.eventDateTime != null && this.eventDateTime.before(new Date())) {
-            this.eventState = EventState.COMPLETED;
-        }
-        else {
-            this.eventState = eventState;
-        }
+        this.eventState = eventState;
     }
 
     public Date getEventDateTime() {

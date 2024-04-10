@@ -89,12 +89,29 @@ public class EventService {
 
             //set cancellation fee
             savedEvent.get().setCancellationFee(eventDto.getCancellationFee());
+            savedEvent.get().setLastModifiedDateTime(new Date());
 
             Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
             EventDto savedEventDto = (EventDto) this.objectConverter.convert(updatedSavedEvent, EventDto.class);
             return Optional.of(savedEventDto);
         }
         return Optional.empty();
+    }
+
+    public void updateStates() {
+
+        List<Event> savedEvents = this.eventRepository.findAll();
+
+        for (long i=0; i<savedEvents.size(); i++) {
+            Optional<Event> savedEvent = this.eventRepository.findById(i);
+            if (savedEvent.isPresent()) {
+                Event event = savedEvent.get();
+                if (event.getEventDateTime().before(new Date()) && !(event.getEventState().equals(EventState.CANCELLED))) {
+                    event.setEventState(EventState.COMPLETED);
+                    Event updatedSavedEvent = this.eventRepository.saveAndFlush(event);
+                }
+            }
+        }
     }
 
     public void deleteEvent(long eventId) {

@@ -60,13 +60,6 @@ public class EventController {
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<EventDto>> getAllEvents() {
         List<EventDto> page = this.eventService.getEvents();
-
-        for (EventDto event : page) {
-            if (event.getEventDateTime().before(new Date())) {
-                event.setEventState(EventState.COMPLETED);
-            }
-        }
-
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
@@ -78,6 +71,17 @@ public class EventController {
             return ResponseEntity.notFound().build();
         }
         return new ResponseEntity<>(savedEvent.get(), HttpStatus.OK);
+    }
+
+    @PutMapping
+    @PreAuthorize("hasRole('EVENT_MANAGER')")
+    public ResponseEntity<?> updateAllStates() {
+
+        this.eventService.updateStates();
+        List<EventDto> events = this.eventService.getEvents();
+        
+
+        return new ResponseEntity<>(events, HttpStatus.OK);
     }
 
     @PutMapping("/{eventId}")

@@ -109,16 +109,94 @@
     
 
     <!-- Deets -->
-    <div class="container-fluid mx-1 mb-5 px-4">
+
+    <!-- Update State -->
+    <div v-if="updateState" class="container-fluid mx-1 mb-5 px-4">
+        <div class="section-header mx-2 mb-5 wow fadeInUp text-white row" data-wow-delay="0.1s" style=" visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
+            <h1 class="display-5 mb-3 text-white fw-bold col-9">
+                Event Details                
+            </h1>            
+        </div>   
+
+        <div class="event-details mx-2 mb-5 row">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> About </p> 
+                <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Venue :</span> 
+                    <input type="text" class="form-control my-3" id="venue" v-model="venue" required>
+                </p> 
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Date & Time :</span>
+                    <input type="datetime-local" class="form-control my-3" id="dateTime" v-model="eventDateTime" required>  
+                </p> 
+                <p class="details mb-1 my-3">
+                    <span class="header"> Event Type :</span>
+                    <select v-model="eventType" class="w-100 my-2">
+                        <option v-for="text, eventType in eventTypes" :value="eventType">{{ text }}</option>
+                    </select>
+                </p>  
+                <p class="details mb-1"> <span class="header"> Event State : </span> 
+                    <span v-if="eventState == 'ACTIVE'" class="text-success fw-bold"> {{ eventState }} </span>
+                    <span v-else-if="eventState == 'CANCELLED' " class="text-danger fw-bold"> {{ eventState }} </span>
+                    <span v-else class="text-warning fw-bold"> {{ eventState }} </span>
+                </p>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> Tickets </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Attendance :</span> 
+                    <input type="number" class="form-control my-3" id="attendance" v-model="attendance" required> 
+                </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Total Tickets :</span> 
+                    <input type="number" class="form-control my-3" id="totalTickets" v-model="totalTickets" required> 
+                </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Tickets Sold :</span> 
+                    <input type="number" class="form-control my-3" id="ticketsSold" v-model="ticketsSold" required>
+                </p> 
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Tickets Available :</span>
+                    <input type="number" class="form-control my-3" id="availableTickets" v-model="availableTickets" required>
+                </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Ticket Price :</span>
+                    <input type="number" class="form-control my-3" id="ticketPrice" v-model="ticketPrice" required>
+                </p>
+                <p class="details mb-1 my-3"> 
+                    <span class="header"> Cancellation Fee :</span>
+                    <input type="number" class="form-control my-3" id="fee" v-model="fee" required>
+                </p>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <p class="mb-4 title"> Creation </p>
+                <p class="details mb-1"> <span class="header"> Created :</span> {{ created }} </p> 
+                <p class="details mb-1"> <span class="header"> Last Modified :</span> {{ lastMod }} </p> 
+                <p class="details mb-1"> <span class="header"> Creator :</span> {{ creator }} </p> 
+            </div>
+             
+               
+        </div>
+        <div class="row mx-2 mb-5 justify-content-center">
+            <button class="col-6 mx-5 my-3 btn rounded-pill w-25 fs-5 fw-medium w-auto px-5"> Update Event </button>
+            <button class="col-6 mx-5 my-3 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="cancelUpdate()"> Cancel Changes </button>
+        </div>
+        
+    </div>
+
+    <!-- Normal State -->
+    <div v-else class="container-fluid mx-1 mb-5 px-4">
         <div class="section-header mx-2 mb-5 wow fadeInUp text-white row" data-wow-delay="0.1s" style=" visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
             <h1 class="display-5 mb-3 text-white fw-bold col-9">
                 Event Details                
             </h1>
             <div class="col-3 d-flex justify-content-end align-items-center">
-                <button class="mx-1 btn rounded-pill fs-5 fw-medium w-auto px-4"> Update Event </button>
+                <button v-if="eventState == 'ACTIVE'" class="mx-1 btn rounded-pill fs-5 fw-medium w-auto px-4" @click="toUpdate()"> Update Event </button>
+                <button v-else class="mx-1 btn rounded-pill fs-5 fw-medium w-auto px-4 disabled"> Update Event </button>
             </div>
             
-        </div>
+        </div>   
 
         <div class="event-details mx-2 mb-5 row">
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
@@ -136,10 +214,11 @@
                 </p>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
-                <p class="mb-4 title"> Tickets </p>
+                <p class="mb-4 title"> Sales </p>
+                <p class="details mb-1"> <span class="header"> Attendance :</span> {{ attendance }} </p>
                 <p class="details mb-1"> <span class="header"> Total Tickets :</span> {{ totalTickets }} </p>
                 <p class="details mb-1"> <span class="header"> Tickets Sold :</span> {{ ticketsSold }} </p> 
-                <p class="details mb-1"> <span class="header"> Tickets Left :</span> {{ ticketsLeft }} </p>
+                <p class="details mb-1"> <span class="header"> Tickets Available :</span> {{ availableTickets }} </p>
                 <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice }} </p>
                 <p class="details mb-1"> <span class="header"> Cancellation Fee :</span> ${{ fee }} </p>
             </div>
@@ -153,7 +232,8 @@
                
         </div>
         <div class="row mx-2 mb-5 justify-content-center">
-            <button class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5"> Cancel Event </button>
+            <button v-if="eventState == 'ACTIVE'" class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5"> Cancel Event </button>
+            <button v-else class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5 disabled"> Cancel Event </button>
         </div>
         
     </div>
@@ -171,17 +251,18 @@
                     ticketsSold: 0,
                     totalTickets: 0,
                     ticketPrice: 0,
-                    ticketsLeft: 0,
                     venue: "",
                     eventType: "",
                     eventState: "",
                     eventId: 0,
+                    eventDateTime: "",
                     dateTime: "",
                     created: "",
                     lastMod: "",
                     creator: "",
                     fee: 0,
-                    
+                    updateState: false,
+                    attendance: 0
                 }
             },
 
@@ -206,18 +287,20 @@
                     })
                     .then(data => {
                         console.log(data)
+                        this.attendance = data.attendanceCount
                         this.eventName = data.name
                         document.title = data.name
                         this.ticketsSold = data.ticketsSold
                         this.totalTickets = data.totalTickets
                         this.ticketPrice = data.ticketPrice
-                        this.ticketsLeft = this.totalTickets - this.ticketsSold
+                        this.availableTickets = data.availableTickets //shld be total - sold, can try
                         this.venue = data.venue
                         this.eventType = data.eventType
                         this.eventState = data.eventState
                         this.fee = data.cancellationFee
 
                         dateTimeRaw = data.eventDateTime
+                        this.eventDateTime = dateTimeRaw
                         date = dateTimeRaw.substring(0, 10)
                         if (dateTimeRaw.substring(11, 13) >= 12) {
                             time = (dateTimeRaw.substring(11, 13) - 12) + dateTimeRaw.substring(13, 16) + " pm"
@@ -258,7 +341,7 @@
 
                         this.creator = data.createdBy
                         console.log(this.ticketsSold)
-                        console.log(this.ticketsLeft)
+                        console.log(this.availableTickets)
                         this.renderChart()
 
                     })
@@ -278,7 +361,7 @@
                         data: {
                             labels: ['Sold', 'Unsold'],
                             datasets: [{
-                                data: [this.ticketsSold, this.ticketsLeft],
+                                data: [this.ticketsSold, this.availableTickets],
                                 backgroundColor: ['#4D0015', '#b7b7a4']
                             }]
                         }
@@ -291,12 +374,35 @@
                         data: {
                             labels: ['Sold', 'Unsold'],
                             datasets: [{
-                                data: [this.ticketsSold, this.ticketsLeft],
+                                data: [this.ticketsSold, this.availableTickets],
                                 backgroundColor: ['#4D0015', '#b7b7a4']
                             }]
                         }
                     })
                     
+                },
+
+                toUpdate() {
+                    this.updateState = true;
+                },
+
+                cancelUpdate() {
+                    this.updateState = false;
+                },
+
+                updateEvent() {
+
+                    dataInput = {
+                        "name": this.eventName,
+                        "venue": this.venue,
+                        "eventDateTime": this.eventDateTime,
+                        "ticketPrice": this.ticketPrice,
+                        "totalTickets":this.totalTickets,
+                        "availableTickets": this.availableTickets,
+                        "eventType": this.eventType,
+                        "cancellationFee": this.fee
+                    }
+
                 },
 
                 cancelEvent() {
