@@ -42,6 +42,8 @@ public class EventDto implements Serializable {
 
     private int attendance_count; 
 
+    private double cancellationFee;
+
 
     public Long getId() {
         return id;
@@ -150,5 +152,13 @@ public class EventDto implements Serializable {
     
     public void setAttendanceCount(int attendanceCount) {
         this.attendance_count = attendanceCount;
+    }
+
+    public double getCancellationFee() {
+        return this.cancellationFee;
+    }
+
+    public void setCancellationFee(double fee) {
+        this.cancellationFee = fee;
     }
 }

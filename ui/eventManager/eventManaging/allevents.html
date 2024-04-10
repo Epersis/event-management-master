@@ -72,9 +72,10 @@
                                 <span v-else-if="event.eventDateTime.substring(11, 13) == 0"> 12{{ event.eventDateTime.substring(13, 16) }} am </span>
                                 <span v-else> {{ event.eventDateTime.substring(11, 16) }} am</span>
                             </p>
-                            <p class="details fw-bold"> <span class="header"> State :</span>
-                                <span v-if="event.eventState == 'ACTIVE'" class="text-success"> ACTIVE </span>
-                                <span v-else class="text-danger"> CANCELLED </span>
+                            <p class="details fw-bold"> <span class="header"> State : </span>
+                                <span v-if="event.eventState == 'ACTIVE'" class="text-success"> {{ event.eventState }} </span>
+                                <span v-else-if="event.eventState == 'CANCELLED'" class="text-danger"> {{ event.eventState }} </span>
+                                <span v-else class="text-warning"> {{ event.eventState }} </span>
                             </p>
                             <button class="btn neg-btn rounded-pill w-100 mt-3" @click="viewEvent(event.id)"> View Event </button>
                         </div>

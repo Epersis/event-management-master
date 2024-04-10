@@ -130,8 +130,9 @@
                     <span v-if="eventType == key"> <span class="header"> Event Type :</span> {{ text }} </span>
                 </p>  
                 <p class="details mb-1"> <span class="header"> Event State : </span> 
-                    <span v-if="eventState == 'ACTIVE'" class="text-success fw-bold"> ACTIVE </span>
-                    <span v-else class="text-danger fw-bold"> CANCELLED </span>
+                    <span v-if="eventState == 'ACTIVE'" class="text-success fw-bold"> {{ eventState }} </span>
+                    <span v-else-if="eventState == 'CANCELLED' " class="text-danger fw-bold"> {{ eventState }} </span>
+                    <span v-else class="text-warning fw-bold"> {{ eventState }} </span>
                 </p>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
@@ -364,7 +365,7 @@
                 eventTypes() {
                     return {
                         "MUSIC_CONCERT" : "Concert",
-                        "THEATARE_SHOW" : "Show",
+                        "THEATRE_SHOW" : "Show",
                         "SEMINAR" : "Seminar",
                         "OTHER" : "Other"
                     }

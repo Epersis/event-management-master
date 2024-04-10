@@ -4,6 +4,8 @@ public enum EventState {
 
     ACTIVE,
 
-    CANCELLED
+    CANCELLED,
+
+    COMPLETED
 
 }

@@ -85,6 +85,9 @@ public class EventService {
             // Set the attendance count from the DTO
             savedEvent.get().setAttendanceCount(eventDto.getAttendanceCount());
 
+            //set cancellation fee
+            savedEvent.get().setCancellationFee(eventDto.getCancellationFee());
+
             Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
             EventDto savedEventDto = (EventDto) this.objectConverter.convert(updatedSavedEvent, EventDto.class);
             return Optional.of(savedEventDto);
@@ -125,6 +128,9 @@ public class EventService {
         Optional<Event> savedEvent = this.eventRepository.findById(id);
         if (savedEvent.get().getEventState().equals(EventState.CANCELLED)) {
             throw new BadRequestException("Event is already cancelled.");
+        }
+        if (savedEvent.get().getEventState().equals(EventState.COMPLETED)) {
+            throw new BadRequestException("Event has ended.");
         }
         if (savedEvent.isPresent()) {
             savedEvent.get().setEventState(EventState.CANCELLED);

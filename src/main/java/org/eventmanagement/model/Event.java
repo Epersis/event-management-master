@@ -35,6 +35,7 @@ public class Event {
 
     private String createdBy;
     private int attendance_count; 
+    private double cancellationFee;
 
     @Basic
     @Generated(GenerationTime.INSERT)
@@ -151,6 +152,14 @@ public class Event {
     
     public void setAttendanceCount(int attendanceCount) {
         this.attendance_count = attendanceCount;
+    }
+
+    public double getCancellationFee() {
+        return this.cancellationFee;
+    }
+
+    public void setCancellationFee(double fee) {
+        this.cancellationFee = fee;
     }
     
 }
