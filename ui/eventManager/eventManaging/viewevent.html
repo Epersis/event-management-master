@@ -141,6 +141,7 @@
                 <p class="details mb-1"> <span class="header"> Tickets Sold :</span> {{ ticketsSold }} </p> 
                 <p class="details mb-1"> <span class="header"> Tickets Left :</span> {{ ticketsLeft }} </p>
                 <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice }} </p>
+                <p class="details mb-1"> <span class="header"> Cancellation Fee :</span> ${{ fee }} </p>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                 <p class="mb-4 title"> Creation </p>
@@ -179,6 +180,7 @@
                     created: "",
                     lastMod: "",
                     creator: "",
+                    fee: 0,
                     
                 }
             },
@@ -213,6 +215,7 @@
                         this.venue = data.venue
                         this.eventType = data.eventType
                         this.eventState = data.eventState
+                        this.fee = data.cancellationFee
 
                         dateTimeRaw = data.eventDateTime
                         date = dateTimeRaw.substring(0, 10)

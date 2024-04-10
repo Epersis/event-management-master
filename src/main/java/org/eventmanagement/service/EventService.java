@@ -3,6 +3,7 @@ package org.eventmanagement.service;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 
 import org.eventmanagement.converter.ObjectConverter;
 import org.eventmanagement.dto.BookingEventDetailsDto;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.eventmanagement.exception.EventNotFoundException;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -56,10 +58,10 @@ public class EventService {
         return Optional.of(returnedEvent);
     }
 
-    public Page<EventDto> getEvents(Pageable pageable) {
-        Page<Event> savedEvents = this.eventRepository.findAll(pageable);
-        Page<EventDto> savedEventDTOPage = savedEvents.map(s -> (EventDto) this.objectConverter.convert(s,
-                EventDto.class));
+    public List<EventDto> getEvents() {
+        List<Event> savedEvents = this.eventRepository.findAll();
+        List<EventDto> savedEventDTOPage = savedEvents.stream().map(s -> (EventDto) this.objectConverter.convert(s,
+                EventDto.class)).collect(Collectors.toList());
         return savedEventDTOPage;
     }
 

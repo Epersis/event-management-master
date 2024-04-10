@@ -57,8 +57,8 @@ public class EventController {
 
     @GetMapping
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
-    public ResponseEntity<Page<EventDto>> getAllEvents(Pageable pageable) {
-        Page<EventDto> page = this.eventService.getEvents(pageable);
+    public ResponseEntity<List<EventDto>> getAllEvents() {
+        List<EventDto> page = this.eventService.getEvents();
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 
@@ -128,8 +128,9 @@ public class EventController {
     public ResponseEntity<byte[]> generateReport() {
         try {
             // Fetch all events
-            Page<EventDto> eventsPage = eventService.getEvents(Pageable.unpaged());
-            List<EventDto> events = eventsPage.getContent();
+            // Page<EventDto> eventsPage = eventService.getEvents(Pageable.unpaged());
+            // List<EventDto> events = eventsPage.getContent();
+            List<EventDto> events = eventService.getEvents();
 
             // Initialize variables to hold total ticket sales and revenue
             int totalTicketsSold = 0;
