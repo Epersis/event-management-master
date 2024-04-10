@@ -264,7 +264,7 @@ public class BookingService {
         LoggedInUserIdentity loggedInUserIdentity = getLoggedInUserIdentity();
         for (Booking booking : bookings) {
             BookingDto bookingDto = (BookingDto) this.objectConverter.convert(booking, BookingDto.class);
-            cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking);
+            cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking,0);
             this.bookingRepository.save(booking);
             bookingDto.setEventDetails(eventDto);
             sendMailOfBooking(bookingDto, "Event Cancelled", "event-cancelled-email-template.ftl");
@@ -298,7 +298,7 @@ public class BookingService {
             throw new BadRequestException("You can cancel the booking for the event only before 48 hours.");
         }
 
-        cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking);
+        cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, event.getCancellationFee());  
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
                 BookingEventDetailsDto.class);
@@ -315,15 +315,16 @@ public class BookingService {
                 BookingDto.class)).collect(Collectors.toList());
     }
 
-    private void cancelAndRefundAmountIfWalletPaymentUsed(LoggedInUserIdentity loggedInUserIdentity, Booking booking) {
+    private void cancelAndRefundAmountIfWalletPaymentUsed(LoggedInUserIdentity loggedInUserIdentity, Booking booking, double cancellationFee) {
         booking.setBookingStatus(BookingStatus.CANCELLED);
         booking.getTransactionDetail().setTransactionStatus(TransactionStatus.REFUNDED);
         if (booking.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
             Optional<Wallet> wallet = this.walletRepository.findByUserEmail(booking.getBookedBy());
             if (wallet.isPresent()) {
+                double cancellationFeeAmount=cancellationFee*booking.getNumberOfTickets();
                 double bookingAmount = booking.getTransactionDetail().getAmount();
                 double currentWalletAmount = wallet.get().getBalance();
-                double totalWalletAmount = currentWalletAmount + bookingAmount;
+                double totalWalletAmount = currentWalletAmount + bookingAmount-cancellationFeeAmount;
                 wallet.get().setBalance(totalWalletAmount);
                 this.walletRepository.saveAndFlush(wallet.get());
             }
