@@ -11,6 +11,7 @@ import org.eventmanagement.dto.MessageResponse;
 import org.eventmanagement.enums.EventState;
 import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.service.EventService;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -59,6 +60,13 @@ public class EventController {
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
     public ResponseEntity<List<EventDto>> getAllEvents() {
         List<EventDto> page = this.eventService.getEvents();
+
+        for (EventDto event : page) {
+            if (event.getEventDateTime().before(new Date())) {
+                event.setEventState(EventState.COMPLETED);
+            }
+        }
+
         return new ResponseEntity<>(page, HttpStatus.OK);
     }
 

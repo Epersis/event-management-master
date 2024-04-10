@@ -14,6 +14,7 @@ import org.eventmanagement.enums.EventState;
 import org.eventmanagement.enums.EventType;
 import org.hibernate.annotations.Generated;
 import org.hibernate.annotations.GenerationTime;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "event")
@@ -124,7 +125,12 @@ public class Event {
     }
 
     public void setEventState(EventState eventState) {
-        this.eventState = eventState;
+        if (this.eventDateTime != null && this.eventDateTime.before(new Date())) {
+            this.eventState = EventState.COMPLETED;
+        }
+        else {
+            this.eventState = eventState;
+        }
     }
 
     public String getCreatedBy() {
