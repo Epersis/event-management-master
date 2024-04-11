@@ -99,19 +99,25 @@ public class EventService {
         return Optional.empty();
     }
 
-    public void updateStates() {
+    public Optional<List<EventDto>> updateStates() {
 
         List<Event> savedEvents = this.eventRepository.findAll();
+        Date currentDate = new Date();
 
-        for (long i=0; i<savedEvents.size(); i++) {
+        for (long i=1; i<savedEvents.size() + 1; i++) {
             Optional<Event> savedEvent = this.eventRepository.findById(i);
             if (savedEvent.isPresent()) {
-                if (savedEvent.get().getEventDateTime().before(new Date()) && !(savedEvent.get().getEventState().equals(EventState.CANCELLED))) {
+                if ((savedEvent.get().getEventDateTime().getTime() < currentDate.getTime()) && !(savedEvent.get().getEventState().equals(EventState.CANCELLED))) {
                     savedEvent.get().setEventState(EventState.COMPLETED);
                     Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
                 }
             }
         }
+
+        List<EventDto> savedEventDTOPage = savedEvents.stream().map(s -> (EventDto) this.objectConverter.convert(s,
+                EventDto.class)).collect(Collectors.toList());
+
+        return Optional.of(savedEventDTOPage);
     }
 
     public void deleteEvent(long eventId) {

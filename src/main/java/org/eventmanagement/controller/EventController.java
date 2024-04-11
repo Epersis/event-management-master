@@ -77,8 +77,8 @@ public class EventController {
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public ResponseEntity<?> updateAllStates() {
 
-        this.eventService.updateStates();
-        List<EventDto> events = this.eventService.getEvents();
+        
+        Optional<List<EventDto>> events = this.eventService.updateStates();
         
 
         return new ResponseEntity<>(events, HttpStatus.OK);
