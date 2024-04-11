@@ -117,7 +117,7 @@
             methods: {
                 fetchUser() {
 
-                    token = localStorage.getItem("token")
+                    token = localStorage.getItem("to_token")
                     console.log(token)
 
                     fetch("http://localhost:8081/api/v1/users/profile", {
@@ -149,12 +149,12 @@
                 },
 
                 logout() {
-                    localStorage.removeItem("token")
+                    localStorage.removeItem("to_token")
                     window.location.href = "../login.html"
                 },
 
                 checkLogin() {
-                    if (!localStorage.getItem("token")) {
+                    if (!localStorage.getItem("to_token")) {
                         window.location.href = "../login.html"
                         alert("Please login")
                     }
