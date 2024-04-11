@@ -74,6 +74,14 @@
     </div>
 
     <script>
+        // Check if user is logged in
+        if (localStorage.getItem('customer_token')) {
+            const customer_token = localStorage.getItem('customer_token');
+        }
+        else {
+            window.location.href = "../../login.html"
+        }
+
         const app = Vue.createApp({
             created() {
                 this.getUserInfo();
@@ -88,7 +96,7 @@
             methods: {
                 logout() {  
                     localStorage.removeItem("customer_token");
-                    window.location.href = '../../login.html';
+                    window.location.href = "../../login.html"
                 },
 
                 getUserInfo() {

@@ -164,7 +164,7 @@
         const customer_token = localStorage.getItem('customer_token');
     }
     else {
-        window.location.href = "login.html";
+        window.location.href = "../../login.html"
     }
     const app = Vue.createApp({
         created() {
@@ -187,7 +187,7 @@
         methods: {
             logout() {  
                 localStorage.removeItem("customer_token");
-                window.location.href = '../../login.html';
+                window.location.href = "../../login.html"
             },
 
             getUserInfo() {
@@ -209,6 +209,7 @@
                 })
                 .then(data => {
                     this.walletBalance = data.walletDetails.balance
+                    localStorage.setItem('walletId', data.walletDetails.walletId)
                     return data
                 })
                 .catch(error => {
@@ -286,7 +287,7 @@
                 const headers = new Headers();
                 const customer_token = localStorage.getItem('customer_token');
                 headers.append('Authorization', `Bearer ${customer_token}`);
-                headers.append('Content-Type', 'application/json'); // Set Content-Type header
+                headers.append('Content-Type', 'application/json'); 
 
                 const requestBody = {
                     bookingUserEmail: customer_info.email,
