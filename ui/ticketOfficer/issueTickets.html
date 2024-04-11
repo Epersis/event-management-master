@@ -28,7 +28,7 @@
 
     <nav class="navbar fixed-top navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand px-3" href="/event-management-master/ui//ticketOfficer/ticketOfficer.html">
+            <a class="navbar-brand px-3" href="/event-management-master/ui/ticketOfficer/ticketOfficer.html">
                 <h1 class="fw-bold text-light">
                     Ticket.ly
                 </h1>
@@ -189,12 +189,12 @@
 
                 logout() {
                     localStorage.removeItem("token")
-                    window.location.href = "../../login.html"
+                    window.location.href = "../login.html"
                 },
 
                 checkLogin() {
                     if (!localStorage.getItem("token")) {
-                        window.location.href = "/login.html"
+                        window.location.href = "../login.html"
                         alert("Please login")
                     }
                 }
