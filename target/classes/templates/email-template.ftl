@@ -46,6 +46,7 @@
 
 <p><strong>Booking ID:</strong> ${bookingid}</p>
 <p><strong>Number of Tickets:</strong> ${bookingNumTickets}</p>
+<p><strong>Ticket IDs:</strong> ${ticketIds}</p>
 
 <p>Thank you for choosing to attend our event. We look forward to seeing you there!</p>
 
