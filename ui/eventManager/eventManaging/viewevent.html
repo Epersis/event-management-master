@@ -118,11 +118,11 @@
                 <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Event Name :</span> 
-                    <input type="text" class="form-control my-3" id="name" :value="name" required>
+                    <input type="text" class="form-control my-3" id="name" v-model="name" required>
                 </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Venue :</span> 
-                    <input type="text" class="form-control my-3" id="venue" :value="venue" required>
+                    <input type="text" class="form-control my-3" id="venue" v-model="venue" required>
                 </p> 
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Date & Time :</span>
@@ -145,20 +145,20 @@
                 <p class="details mb-1"> <span class="header"> Attendance :</span> {{ attendanceCount }} </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Total Tickets :</span> 
-                    <input type="number" class="form-control my-3" id="totalTickets" :value="totalTickets" required> 
+                    <input type="number" class="form-control my-3" id="totalTickets" v-model="totalTickets" required> 
                 </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Tickets Sold :</span> 
-                    <input type="number" class="form-control my-3" id="ticketsSold" :value="ticketsSold" required>
+                    <input type="number" class="form-control my-3" id="ticketsSold" v-model="ticketsSold" required>
                 </p> 
                 <p class="details mb-1"> <span class="header"> Tickets Available :</span> </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Ticket Price :</span>
-                    <input type="number" class="form-control my-3" id="ticketPrice" :value="ticketPrice" required>
+                    <input type="number" class="form-control my-3" id="ticketPrice" v-model="ticketPrice" required>
                 </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Cancellation Fee :</span>
-                    <input type="number" class="form-control my-3" id="cancellationFee" :value="cancellationFee" required>
+                    <input type="number" class="form-control my-3" id="cancellationFee" v-model="cancellationFee" required>
                 </p>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
@@ -465,6 +465,7 @@
                 },
 
                 cancelUpdate() {
+                    this.fetchEvent();
                     this.updateState = false;
                 },
 
