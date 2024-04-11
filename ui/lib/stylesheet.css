@@ -99,6 +99,18 @@
         background-position: center;
     }
 
+    &.to-header {
+        background: url(../img/thumbnail.jpeg) top right no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
+    &.ticket-header {
+        background: url(../img/tickets.jpg) top right no-repeat;
+        background-size: cover;
+        background-position: center;
+    }
+
 }
 
 .title {
