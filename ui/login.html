@@ -83,7 +83,9 @@
                         localStorage.setItem('token', data.token)
 
                         if (data.role == "ROLE_CUSTOMER") {
-                            //REDIRECT TO CUSTOMER PAGE
+                            const customer_token = data['token'];
+                            localStorage.setItem('customer_token', customer_token)
+                            window.location.href = "customer_ui/public/customer_home.html"
                         }
                         else if (data.role == "ROLE_EVENT_MANAGER") {
                             //REDIRECT TO EVENT MANAGER PAGE
