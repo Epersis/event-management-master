@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class BookingController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('CUSTOMER')")
     public ResponseEntity<?> createBooking(@RequestBody @Valid BookingDto bookingDto, BindingResult bindingResult) throws BadRequestException,
             EntityDoesNotExistException {
 
@@ -42,6 +43,18 @@ public class BookingController {
         Optional<BookingDto> savedBookingDto = this.bookingService.bookEventTicket(bookingDto);
         return new ResponseEntity<>(savedBookingDto.get(), HttpStatus.CREATED);
     }
+
+    @PostMapping("/ticket-officer/book/{customerEmail}")
+    @PreAuthorize("hasRole('TICKET_OFFICER')")
+    public ResponseEntity<?> bookEventTicketForCustomer(@RequestBody @Valid BookingDto bookingDto, @PathVariable String customerEmail, BindingResult bindingResult) throws BadRequestException,
+            EntityDoesNotExistException {
+    
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Input JSON is invalid."));
+        }
+        Optional<BookingDto> savedBookingDto = this.bookingService.bookEventTicketForCustomer(bookingDto, customerEmail);
+        return new ResponseEntity<>(savedBookingDto.get(), HttpStatus.CREATED);
+    }    
 
     @GetMapping(value = "/{bookingId}")
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")

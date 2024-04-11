@@ -135,6 +135,52 @@ public class BookingService {
         return Optional.of(savedBookingDto);
     }
 
+    @Transactional(rollbackFor = { Exception.class })
+    public Optional<BookingDto> bookEventTicketForCustomer(BookingDto bookingDto, String customerEmail) throws EntityDoesNotExistException, BadRequestException {
+        LOGGER.debug("Ticket booking has been started.");
+
+        LoggedInUserIdentity loggedInUser = getLoggedInUserIdentity(); // get the logged in user details
+        LOGGER.debug("User " + loggedInUser.whoAmI() + " is performing the booking operation with role "
+        + loggedInUser.role());
+        // First check for Events validity, exist or not?
+        validateEvent(bookingDto.getEventId(), loggedInUser.role());
+
+        // Validate if we have sufficient number of tickets or not for this event
+        checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
+
+        bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
+
+        // set the identity from JWT token who is performing this booking.
+        bookingDto.setBookedBy(loggedInUser.whoAmI());
+
+        // populateBookingUserDetails
+        populateBookingUserDetails(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
+
+        Event event = this.eventRepository.findById(bookingDto.getEventId())
+                .orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
+        event.setAvailableTickets(event.getAvailableTickets() - bookingDto.getNumberOfTickets());
+
+        BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
+                BookingEventDetailsDto.class);
+        Booking booking = (Booking) this.objectConverter.convert(bookingDto, Booking.class);
+
+        // Create and associate tickets with the booking
+        List<Ticket> tickets = createTicketsForBooking(booking);
+        booking.setTickets(tickets);
+
+        booking.getTransactionDetail().setBooking(booking);
+        Booking savedBooking = this.bookingRepository.saveAndFlush(booking);
+        this.eventRepository.saveAndFlush(event);
+        BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
+        savedBookingDto.setEventDetails(bookingEventDetailsDto);
+        savedBookingDto.setBookingStatus(BookingStatus.ACCEPTED);
+        if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
+            sendMailOfBooking2(savedBookingDto, "Ticket Confirmation", "email-template.ftl", customerEmail);
+        }
+        return Optional.of(savedBookingDto);
+
+    }
+
     private List<Ticket> createTicketsForBooking(Booking booking) {
         List<Ticket> tickets = new ArrayList<>();
         int numberOfTickets = booking.getNumberOfTickets();
@@ -394,6 +440,53 @@ public class BookingService {
             System.err.println("Error sending email: " + e.getMessage());
         }
     }
+
+    public void sendMailOfBooking2(BookingDto savedBookingDto, String subject, String emailTemplateName, String customerEmail) {
+        EmailDetailsDto emailDetailDto = new EmailDetailsDto();
+        emailDetailDto.setTo(customerEmail); // Set the recipient email to the customerEmail parameter
+        emailDetailDto.setSubject(subject);
+        emailDetailDto.setTemplateName(emailTemplateName);
+    
+        // Prepare model for the template
+        Map<String, Object> model = new HashMap<>();
+        model.put("eventname", savedBookingDto.getEventDetails().getName());
+        model.put("eventdate", savedBookingDto.getEventDetails().getEventDateTime());
+        model.put("eventvenue", savedBookingDto.getEventDetails().getVenue());
+        model.put("bookingid", savedBookingDto.getBookingId());
+        model.put("bookingNumTickets", savedBookingDto.getNumberOfTickets());
+    
+        // Fetch the tickets associated with the booking
+        List<TicketDto> tickets = savedBookingDto.getTickets();
+        List<Long> ticketIds = new ArrayList<>(); // List to store ticket IDs
+        for (TicketDto ticket : tickets) {
+            ticketIds.add(ticket.getId());
+        }
+    
+        // Convert the list of ticket IDs to a comma-separated string
+        StringBuilder ticketIdsBuilder = new StringBuilder();
+        for (Long id : ticketIds) {
+            if (ticketIdsBuilder.length() > 0) {
+                ticketIdsBuilder.append(", ");
+            }
+            ticketIdsBuilder.append(id);
+        }
+    
+        // Convert the StringBuilder to a String
+        String ticketIdsString = ticketIdsBuilder.toString();
+    
+        // Add the ticket IDs string to the model
+        model.put("ticketIds", ticketIdsString);
+    
+        emailDetailDto.setModel(model);
+    
+        try {
+            // Send the email
+            emailService.sendEmail(emailDetailDto);
+        } catch (Exception e) {
+            System.err.println("Error sending email: " + e.getMessage());
+        }
+    }
+    
     
 
     // public void sendMailOfBooking(BookingDto savedBookingDto, String subject,
