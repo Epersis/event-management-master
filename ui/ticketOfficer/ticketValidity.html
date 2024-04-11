@@ -137,12 +137,12 @@
         },
 
         logout() {
-          localStorage.removeItem("token")
+          localStorage.removeItem("to_token")
           window.location.href = "../login.html"
         },
 
         checkLogin() {
-            if (!localStorage.getItem("token")) {
+            if (!localStorage.getItem("to_token")) {
                 window.location.href = "../login.html"
                 alert("Please login")
             }
