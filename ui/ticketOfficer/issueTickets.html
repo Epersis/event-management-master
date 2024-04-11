@@ -5,7 +5,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Home</title>
+    <title>Issue Tickets</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
@@ -194,7 +194,7 @@
 
                 checkLogin() {
                     if (!localStorage.getItem("token")) {
-                        window.location.href = "../../login.html"
+                        window.location.href = "/login.html"
                         alert("Please login")
                     }
                 }
