@@ -10,6 +10,7 @@ import org.eventmanagement.service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class WalletController {
     private WalletService walletService;
 
     @PutMapping("/{walletId}/add/{amount}")
+    @CrossOrigin
     public ResponseEntity<?> addMoneyToWallet(@PathVariable Long walletId, @PathVariable long amount)
             throws BadRequestException,
             EntityDoesNotExistException {
