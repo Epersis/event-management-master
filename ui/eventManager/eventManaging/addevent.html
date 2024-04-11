@@ -136,7 +136,7 @@
                     console.log(this.eventDateTime)
                     console.log(this.eventType)
 
-                    token = localStorage.getItem("token")
+                    token = localStorage.getItem("em_token")
                     console.log(token)
 
                     dataInput = {
@@ -186,12 +186,12 @@
                 },
 
                 logout() {
-                    localStorage.removeItem("token")
+                    localStorage.removeItem("em_token")
                     window.location.href = "../../login.html"
                 },
 
                 checkLogin() {
-                    if (!localStorage.getItem("token")) {
+                    if (!localStorage.getItem("em_token")) {
                         window.location.href = "../../login.html"
                         alert("Please login")
                     }

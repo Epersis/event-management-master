@@ -101,7 +101,7 @@
             methods: {
                 fetchEvents() {
 
-                    token = localStorage.getItem("token")
+                    token = localStorage.getItem("em_token")
                     console.log(token)
 
                     fetch("http://localhost:8081/api/v1/events", {
@@ -151,12 +151,12 @@
                 },
 
                 logout() {
-                    localStorage.removeItem("token")
+                    localStorage.removeItem("em_token")
                     window.location.href = "../../login.html"
                 },
 
                 checkLogin() {
-                    if (!localStorage.getItem("token")) {
+                    if (!localStorage.getItem("em_token")) {
                         window.location.href = "../../login.html"
                         alert("Please login")
                     }
@@ -164,7 +164,7 @@
 
                 updateEventStates() {
 
-                    token = localStorage.getItem("token")
+                    token = localStorage.getItem("em_token")
                     console.log(token)
 
                     fetch("http://localhost:8081/api/v1/events/updateAll", {

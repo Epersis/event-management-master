@@ -336,7 +336,7 @@
             methods: {
                 fetchEvent() {
 
-                    token = localStorage.getItem("token")
+                    token = localStorage.getItem("em_token")
                     eventId = localStorage.getItem("eventId")
                     this.eventId = eventId
 
@@ -623,12 +623,12 @@
                 },
 
                 logout() {
-                    localStorage.removeItem("token")
+                    localStorage.removeItem("em_token")
                     window.location.href = "../../login.html"
                 },
 
                 checkLogin() {
-                    if (!localStorage.getItem("token")) {
+                    if (!localStorage.getItem("em_token")) {
                         window.location.href = "../../login.html"
                         alert("Please login")
                     }
