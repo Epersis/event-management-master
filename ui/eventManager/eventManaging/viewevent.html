@@ -150,10 +150,7 @@
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                 <p class="mb-4 title"> Sales </p>
-                <p class="details mb-1 my-3"> 
-                    <span class="header"> Attendance :</span> 
-                    <input type="number" class="form-control my-3" id="attendanceCount" :value="attendanceCount" required> 
-                </p>
+                <p class="details mb-1"> <span class="header"> Attendance :</span> {{ attendanceCount }} </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Total Tickets :</span> 
                     <input type="number" class="form-control my-3" id="totalTickets" :value="totalTickets" required> 
@@ -251,7 +248,7 @@
                 <div class="justify-content-center align-items-center d-flex">
                     <div class="row w-100">
                         <div class="col-md-6">
-                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="updateEvent('updated')"> Yes </button>
+                            <button class="btn rounded-pill w-100 mt-2 d-inline" @click="updateEvent('updated')"> Yes </button>
                         </div>
                         <div class="col-md-6">
                             <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="closeCfm('update')"> No </button>
@@ -439,14 +436,14 @@
                     })
 
                     // compute attendance from ticket officer aft can verify attendance
-                    const attendance = document.getElementById('attendanceCount').getContext('2d');
+                    const attendance = document.getElementById('attendance').getContext('2d');
                     new Chart(attendance, {
                         type: 'pie',
                         data: {
                             labels: ['Attended', 'Unattended', 'Unsold'],
                             datasets: [{
                                 data: [this.attendanceCount, this.ticketsSold - this.attendanceCount, this.totalTickets - this.ticketsSold],
-                                backgroundColor: ['#4D0015', '#b7b7a4', "white"]
+                                backgroundColor: ['#052e1f', '#5e313d', '#b7b7a4']
                             }]
                         }
                     })
@@ -490,13 +487,13 @@
                         "ticketPrice",
                         "totalTickets",
                         "eventType",
-                        "cancellationFee",
-                        "attendanceCount"
+                        "cancellationFee"
                     ]
 
                     dataInput = {}
 
                     dataInput["availableTickets"] = document.getElementById("totalTickets").value - document.getElementById("ticketsSold").value
+                    dataInput["attendanceCount"] = this.attendanceCount
 
                     for (iter of toIterate) {
                         console.log(iter)

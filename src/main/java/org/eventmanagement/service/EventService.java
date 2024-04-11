@@ -106,10 +106,9 @@ public class EventService {
         for (long i=0; i<savedEvents.size(); i++) {
             Optional<Event> savedEvent = this.eventRepository.findById(i);
             if (savedEvent.isPresent()) {
-                Event event = savedEvent.get();
-                if (event.getEventDateTime().before(new Date()) && !(event.getEventState().equals(EventState.CANCELLED))) {
-                    event.setEventState(EventState.COMPLETED);
-                    Event updatedSavedEvent = this.eventRepository.saveAndFlush(event);
+                if (savedEvent.get().getEventDateTime().before(new Date()) && !(savedEvent.get().getEventState().equals(EventState.CANCELLED))) {
+                    savedEvent.get().setEventState(EventState.COMPLETED);
+                    Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
                 }
             }
         }
