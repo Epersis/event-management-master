@@ -150,10 +150,7 @@
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                 <p class="mb-4 title"> Sales </p>
-                <p class="details mb-1 my-3"> 
-                    <span class="header"> Attendance :</span> 
-                    <input type="number" class="form-control my-3" id="attendanceCount" :value="attendanceCount" required> 
-                </p>
+                <p class="details mb-1"> <span class="header"> Attendance :</span> {{ attendanceCount }} </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Total Tickets :</span> 
                     <input type="number" class="form-control my-3" id="totalTickets" :value="totalTickets" required> 
@@ -182,7 +179,7 @@
                
         </div>
         <div class="row mx-2 mb-5 justify-content-center">
-            <button class="col-6 mx-5 my-3 btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="checkUpdate()"> Update Event </button>
+            <button class="col-6 mx-5 my-3 btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="checkChange('update')"> Update Event </button>
             <button class="col-6 mx-5 my-3 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="cancelUpdate()"> Cancel Changes </button>
         </div>
         
@@ -235,7 +232,7 @@
                
         </div>
         <div class="row mx-2 mb-5 justify-content-center">
-            <button v-if="eventState == 'ACTIVE'" class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5"> Cancel Event </button>
+            <button v-if="eventState == 'ACTIVE'" class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="checkChange('cancellation')"> Cancel Event </button>
             <button v-else class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5 disabled"> Cancel Event </button>
         </div>
         
@@ -243,17 +240,18 @@
 
     </div>
 
-    <div class="container pop-up align-items-center justify-content-center" id="confirm">
+    <!-- Pop-ups -->
+    <div class="container pop-up align-items-center justify-content-center" id="update">
         <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
-                <div class="mb-4 title text-center"> Confirm update? </div>
+                <div class="mb-4 title text-center"> Confirm {{ checkState }}? </div>
                 <div class="justify-content-center align-items-center d-flex">
                     <div class="row w-100">
                         <div class="col-md-6">
-                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="updateEvent()"> Yes </button>
+                            <button class="btn rounded-pill w-100 mt-2 d-inline" @click="updateEvent('updated')"> Yes </button>
                         </div>
                         <div class="col-md-6">
-                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="closeCfm()"> No </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="closeCfm('update')"> No </button>
                         </div>
                     </div>
                 </div>
@@ -262,10 +260,41 @@
         </div>
     </div>
 
-    <div class="container pop-up align-items-center justify-content-center" id="popUp">
+    <div class="container pop-up align-items-center justify-content-center" id="updated">
         <div class="card shadow-sm m-1 w-auto">
             <div class="card-body">
-                <div class="mb-4 title text-center"> Event has been successfully updated! </div>
+                <div class="mb-4 title text-center"> Event has been successfully {{ successState }}! </div>
+                <div class="justify-content-center align-items-center d-flex">
+                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="container pop-up align-items-center justify-content-center" id="cancellation">
+        <div class="card shadow-sm m-1 w-50">
+            <div class="card-body">
+                <div class="mb-4 title text-center"> Confirm {{ checkState }}? </div>
+                <div class="justify-content-center align-items-center d-flex">
+                    <div class="row w-100">
+                        <div class="col-md-6">
+                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="cancelEvent('cancelled')"> Yes </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="closeCfm('cancellation')"> No </button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="container pop-up align-items-center justify-content-center" id="cancelled">
+        <div class="card shadow-sm m-1 w-auto">
+            <div class="card-body">
+                <div class="mb-4 title text-center"> Event has been successfully {{ successState }}! </div>
                 <div class="justify-content-center align-items-center d-flex">
                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
                 </div>
@@ -298,7 +327,9 @@
                     creator: "",
                     cancellationFee: 0,
                     updateState: false,
-                    attendanceCount: 0
+                    attendanceCount: 0,
+                    checkState: "",
+                    successState: ""
                 }
             },
 
@@ -405,14 +436,14 @@
                     })
 
                     // compute attendance from ticket officer aft can verify attendance
-                    const attendance = document.getElementById('attendanceCount').getContext('2d');
+                    const attendance = document.getElementById('attendance').getContext('2d');
                     new Chart(attendance, {
                         type: 'pie',
                         data: {
                             labels: ['Attended', 'Unattended', 'Unsold'],
                             datasets: [{
                                 data: [this.attendanceCount, this.ticketsSold - this.attendanceCount, this.totalTickets - this.ticketsSold],
-                                backgroundColor: ['#4D0015', '#b7b7a4', "white"]
+                                backgroundColor: ['#052e1f', '#5e313d', '#b7b7a4']
                             }]
                         }
                     })
@@ -423,18 +454,20 @@
                     this.updateState = true;
                 },
 
-                checkUpdate() {
-                    document.getElementById("confirm").setAttribute("style", "display: inline-flex")
+                checkChange(check) {
+                    this.checkState = check
+                    document.getElementById(check).setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                 },
 
-                closeCfm() {
-                    document.getElementById("confirm").setAttribute("style", "display: none")
+                closeCfm(check) {
+                    document.getElementById(check).setAttribute("style", "display: none")
                     document.getElementById("overlay").setAttribute("style", "opacity: 1")
                 },
 
                 close() {
-                    document.getElementById("popUp").setAttribute("style", "display: none")
+                    document.getElementById("updated").setAttribute("style", "display: none")
+                    document.getElementById("cancelled").setAttribute("style", "display: none")
                     document.getElementById("overlay").setAttribute("style", "opacity: 1")
                     location.reload()
                 },
@@ -443,7 +476,7 @@
                     this.updateState = false;
                 },
 
-                updateEvent() {
+                updateEvent(check) {
 
                     console.log(this.totalTickets)
 
@@ -454,13 +487,13 @@
                         "ticketPrice",
                         "totalTickets",
                         "eventType",
-                        "cancellationFee",
-                        "attendanceCount"
+                        "cancellationFee"
                     ]
 
                     dataInput = {}
 
                     dataInput["availableTickets"] = document.getElementById("totalTickets").value - document.getElementById("ticketsSold").value
+                    dataInput["attendanceCount"] = this.attendanceCount
 
                     for (iter of toIterate) {
                         console.log(iter)
@@ -505,8 +538,9 @@
                     })
                     .then(data => {
                         console.log(data)
-                        document.getElementById("confirm").setAttribute("style", "display: none")
-                        document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                        this.successState = check
+                        document.getElementById("update").setAttribute("style", "display: none")
+                        document.getElementById("updated").setAttribute("style", "display: inline-flex")
                         document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                     })
                     .catch (error => {
@@ -516,9 +550,35 @@
 
                 },
 
-                cancelEvent() {
+                cancelEvent(check) {
 
-                    fetch()
+                    fetch(`http://localhost:8081/api/v1/events/${this.eventId}/cancel`, {
+                        method: "POST",
+                        headers: {
+                            'Authorization': 'Bearer ' + token
+                        },
+                    })
+                    .then(response => {
+                        console.log(response)
+                        
+                        if (!response.ok) {
+                                console.log("got error")
+                                throw new Error("got error")
+                            }
+                            
+                        return response.json()
+                    })
+                    .then(data => {
+                        console.log(data)
+
+                        this.successState = check
+                        document.getElementById("cancellation").setAttribute("style", "display: none")
+                        document.getElementById("cancelled").setAttribute("style", "display: inline-flex")
+                        document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                    })
+                    .catch (error => {
+                        console.log(error)
+                    })  
 
                 },
 
