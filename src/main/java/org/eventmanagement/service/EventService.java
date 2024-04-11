@@ -118,7 +118,7 @@ public class EventService {
                 EventDto.class)).collect(Collectors.toList());
 
         return Optional.of(savedEventDTOPage);
-    }
+    }   
 
     public void deleteEvent(long eventId) {
         Optional<Event> savedEvent = this.eventRepository.findById(eventId);
