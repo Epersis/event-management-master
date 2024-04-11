@@ -82,7 +82,7 @@
             console.log(token)
             console.log(this.eventID)
 
-            fetch(`http://localhost:8081/api/v1/events/${this.eventID}/check-validity`, {
+            fetch('http://localhost:8081/api/v1/tickets/get_status/{this.ticketID}', {
                 // headers: {
                 //     'Authorization': 'Bearer ' + token
                 // }
