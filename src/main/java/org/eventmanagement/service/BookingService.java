@@ -15,7 +15,7 @@ import org.eventmanagement.dto.EventDto;
 import org.eventmanagement.dto.PaymentMethod;
 import org.eventmanagement.dto.TransactionStatus;
 import org.eventmanagement.dto.UserDetailsImpl;
-import org.eventmanagement.dto.TicketDto; 
+import org.eventmanagement.dto.TicketDto;
 import org.eventmanagement.enums.TicketState;
 import org.eventmanagement.enums.BookingStatus;
 import org.eventmanagement.enums.Role;
@@ -74,41 +74,44 @@ public class BookingService {
     private record LoggedInUserIdentity(String whoAmI, Role role) {
     }
 
-    @Transactional(rollbackFor = {Exception.class})
+    @Transactional(rollbackFor = { Exception.class })
     public Optional<BookingDto> bookEventTicket(BookingDto bookingDto) throws EntityDoesNotExistException,
             BadRequestException {
         LOGGER.debug("Ticket booking has been started.");
 
         LoggedInUserIdentity loggedInUser = getLoggedInUserIdentity(); // get the logged in user details
 
-        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CASH)) {
+        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER)
+                && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CASH)) {
             throw new BadRequestException("CUSTOMER can not purchase the tickets with Payment Method CASH.");
         }
 
-        LOGGER.debug("User " + loggedInUser.whoAmI() + " is performing the booking operation with role " + loggedInUser.role());
+        LOGGER.debug("User " + loggedInUser.whoAmI() + " is performing the booking operation with role "
+                + loggedInUser.role());
         // First check for Events validity, exist or not?
         validateEvent(bookingDto.getEventId(), loggedInUser.role());
 
-        //Validate if we have sufficient number of tickets or not for this event
+        // Validate if we have sufficient number of tickets or not for this event
         checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
 
-        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
-           //Validate if User has the required amount in Wallet
+        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER)
+                && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
+            // Validate if User has the required amount in Wallet
             checkForWalletBalanceIfWalletPaymentIsUsed(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
         }
-        
+
         bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
 
         // set the identity from JWT token who is performing this booking.
         bookingDto.setBookedBy(loggedInUser.whoAmI());
 
-        //populateBookingUserDetails
+        // populateBookingUserDetails
         populateBookingUserDetails(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
 
-        Event event = this.eventRepository.findById(bookingDto.getEventId()).orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
+        Event event = this.eventRepository.findById(bookingDto.getEventId())
+                .orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
         event.setAvailableTickets(event.getAvailableTickets() - bookingDto.getNumberOfTickets());
-        
-        
+
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
                 BookingEventDetailsDto.class);
         Booking booking = (Booking) this.objectConverter.convert(bookingDto, Booking.class);
@@ -123,13 +126,59 @@ public class BookingService {
         BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
         savedBookingDto.setEventDetails(bookingEventDetailsDto);
 
-
-        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
+        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER)
+                && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
             if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
                 sendMailOfBooking(savedBookingDto, "Ticket Confirmation", "email-template.ftl");
             }
         }
         return Optional.of(savedBookingDto);
+    }
+
+    @Transactional(rollbackFor = { Exception.class })
+    public Optional<BookingDto> bookEventTicketForCustomer(BookingDto bookingDto, String customerEmail) throws EntityDoesNotExistException, BadRequestException {
+        LOGGER.debug("Ticket booking has been started.");
+
+        LoggedInUserIdentity loggedInUser = getLoggedInUserIdentity(); // get the logged in user details
+        LOGGER.debug("User " + loggedInUser.whoAmI() + " is performing the booking operation with role "
+        + loggedInUser.role());
+        // First check for Events validity, exist or not?
+        validateEvent(bookingDto.getEventId(), loggedInUser.role());
+
+        // Validate if we have sufficient number of tickets or not for this event
+        checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
+
+        bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
+
+        // set the identity from JWT token who is performing this booking.
+        bookingDto.setBookedBy(loggedInUser.whoAmI());
+
+        // populateBookingUserDetails
+        populateBookingUserDetails(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
+
+        Event event = this.eventRepository.findById(bookingDto.getEventId())
+                .orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
+        event.setAvailableTickets(event.getAvailableTickets() - bookingDto.getNumberOfTickets());
+
+        BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
+                BookingEventDetailsDto.class);
+        Booking booking = (Booking) this.objectConverter.convert(bookingDto, Booking.class);
+
+        // Create and associate tickets with the booking
+        List<Ticket> tickets = createTicketsForBooking(booking);
+        booking.setTickets(tickets);
+
+        booking.getTransactionDetail().setBooking(booking);
+        Booking savedBooking = this.bookingRepository.saveAndFlush(booking);
+        this.eventRepository.saveAndFlush(event);
+        BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
+        savedBookingDto.setEventDetails(bookingEventDetailsDto);
+        savedBookingDto.setBookingStatus(BookingStatus.ACCEPTED);
+        if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
+            sendMailOfBooking2(savedBookingDto, "Ticket Confirmation", "email-template.ftl", customerEmail);
+        }
+        return Optional.of(savedBookingDto);
+
     }
 
     private List<Ticket> createTicketsForBooking(Booking booking) {
@@ -142,7 +191,7 @@ public class BookingService {
             tickets.add(ticketRepository.save(ticket));
         }
         return tickets;
-    }    
+    }
 
     private static LoggedInUserIdentity getLoggedInUserIdentity() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -157,18 +206,21 @@ public class BookingService {
     }
 
     private void bookingByUPIOrCard(BookingDto bookingDto) {
-        if (bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.UPI) || bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CARD)) {
+        if (bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.UPI)
+                || bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CARD)) {
             bookingDto.getTransactionDetail().setTransactionStatus(TransactionStatus.PENDING);
             bookingDto.setBookingStatus(BookingStatus.PENDING);
         }
     }
 
-    private void checkForWalletBalanceIfWalletPaymentIsUsed(BookingDto dto, Role role, String whoAmI) throws EntityDoesNotExistException, BadRequestException {
-        if (role.equals(Role.ROLE_CUSTOMER) && dto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
+    private void checkForWalletBalanceIfWalletPaymentIsUsed(BookingDto dto, Role role, String whoAmI)
+            throws EntityDoesNotExistException, BadRequestException {
+        if (role.equals(Role.ROLE_CUSTOMER)
+                && dto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
             User savedUser = this.userRepository.findByEmail(whoAmI).orElseThrow(() -> new EntityDoesNotExistException(
                     "User does not exist."));
-            Event event =
-                    this.eventRepository.findById(dto.getEventId()).orElseThrow(() -> new EntityDoesNotExistException(
+            Event event = this.eventRepository.findById(dto.getEventId())
+                    .orElseThrow(() -> new EntityDoesNotExistException(
                             "Event does not exist"));
             double bookingAmount = dto.getNumberOfTickets() * event.getTicketPrice();
 
@@ -180,7 +232,8 @@ public class BookingService {
 
             if (wallet.get().getBalance() < bookingAmount) {
                 throw new BadRequestException("You can not proceed with booking as wallet amount is lower than " +
-                        "booking amount." + "Booking amount is " + bookingAmount + " where as wallet amount is " + wallet.get().getBalance());
+                        "booking amount." + "Booking amount is " + bookingAmount + " where as wallet amount is "
+                        + wallet.get().getBalance());
             } else {
                 LOGGER.debug("Wallet has the required amount, marking ");
                 double updatedWalletBalance = wallet.get().getBalance() - bookingAmount;
@@ -193,7 +246,8 @@ public class BookingService {
         }
     }
 
-    private void populateBookingUserDetails(BookingDto bookingDto, Role role, String whoAmI) throws EntityDoesNotExistException, BadRequestException {
+    private void populateBookingUserDetails(BookingDto bookingDto, Role role, String whoAmI)
+            throws EntityDoesNotExistException, BadRequestException {
 
         if (role.equals(Role.ROLE_CUSTOMER)) {
             Optional<User> savedUser = this.userRepository.findByEmail(whoAmI);
@@ -207,7 +261,8 @@ public class BookingService {
                 bookingDto.setBookingUserEmail(savedUser.get().getEmail());
             }
             if (null == bookingDto.getBookingMobileNumber()) {
-                //TODO add mobile number support //bookingDto.setBookingUserEmail(savedUser.get().PhoneNumber());
+                // TODO add mobile number support
+                // //bookingDto.setBookingUserEmail(savedUser.get().PhoneNumber());
             }
         } else if (role.equals(Role.ROLE_TICKET_OFFICER)) {
             if (null == bookingDto.getBookingUserEmail() || null == bookingDto.getBookingMobileNumber()) {
@@ -232,7 +287,8 @@ public class BookingService {
             LOGGER.error("Event does not exist in system with event ID" + eventId);
             throw new EntityDoesNotExistException("Event with this id" + eventId + " does not exist.");
         }
-        // This validation is only for customer to book the event under 6 month and before 24 hours.
+        // This validation is only for customer to book the event under 6 month and
+        // before 24 hours.
         // Ticket Officer can issue ticket for such events.
         if (role.equals(Role.ROLE_CUSTOMER)) {
             LOGGER.debug("Validating the event book time for customer role.");
@@ -256,10 +312,9 @@ public class BookingService {
         }
     }
 
-
     public Optional<BookingDto> getBookingDetails(String bookingId) throws EntityDoesNotExistException {
-        Booking booking =
-                this.bookingRepository.findById(UUID.fromString(bookingId)).orElseThrow(() -> new EntityDoesNotExistException("Entity does not exist for this booking ID" + bookingId));
+        Booking booking = this.bookingRepository.findById(UUID.fromString(bookingId)).orElseThrow(
+                () -> new EntityDoesNotExistException("Entity does not exist for this booking ID" + bookingId));
         BookingDto bookingDto = (BookingDto) this.objectConverter.convert(booking, BookingDto.class);
         return Optional.of(bookingDto);
     }
@@ -268,7 +323,7 @@ public class BookingService {
         LoggedInUserIdentity loggedInUserIdentity = getLoggedInUserIdentity();
         for (Booking booking : bookings) {
             BookingDto bookingDto = (BookingDto) this.objectConverter.convert(booking, BookingDto.class);
-            cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking,0);
+            cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, 0);
             this.bookingRepository.save(booking);
             bookingDto.setEventDetails(eventDto);
             sendMailOfBooking(bookingDto, "Event Cancelled", "event-cancelled-email-template.ftl");
@@ -277,21 +332,23 @@ public class BookingService {
 
     public Optional<BookingDto> cancelBookingById(String bookingId) throws EntityDoesNotExistException,
             BadRequestException {
-        Booking booking =
-                this.bookingRepository.findById(UUID.fromString(bookingId)).orElseThrow(() -> new EntityDoesNotExistException("Entity does not exist for this booking ID" + bookingId));
+        Booking booking = this.bookingRepository.findById(UUID.fromString(bookingId)).orElseThrow(
+                () -> new EntityDoesNotExistException("Entity does not exist for this booking ID" + bookingId));
 
         LoggedInUserIdentity loggedInUserIdentity = getLoggedInUserIdentity();
 
         if (!booking.getBookedBy().equals(loggedInUserIdentity.whoAmI)) {
-            throw new BadRequestException("You can't cancel this booking as it is booked by another person: " + booking.getBookedBy());
+            throw new BadRequestException(
+                    "You can't cancel this booking as it is booked by another person: " + booking.getBookedBy());
         }
 
         if (booking.getBookingStatus().equals(BookingStatus.CANCELLED)) {
             throw new BadRequestException("Booking has been already cancelled.");
         }
 
-        Event event = this.eventRepository.findById(booking.getEventId()).orElseThrow(() ->
-                new EntityDoesNotExistException("Event with this id" + booking.getEventId() + " does not exist."));
+        Event event = this.eventRepository.findById(booking.getEventId())
+                .orElseThrow(() -> new EntityDoesNotExistException(
+                        "Event with this id" + booking.getEventId() + " does not exist."));
         DateTime target = new DateTime(event.getEventDateTime(), DateTimeZone.UTC);
         DateTime currentDateTime = DateTime.now(DateTimeZone.UTC);
         Duration duration = new Duration(currentDateTime, target);
@@ -302,7 +359,7 @@ public class BookingService {
             throw new BadRequestException("You can cancel the booking for the event only before 48 hours.");
         }
 
-        cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, event.getCancellationFee());  
+        cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, event.getCancellationFee());
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
                 BookingEventDetailsDto.class);
@@ -319,29 +376,31 @@ public class BookingService {
                 BookingDto.class)).collect(Collectors.toList());
     }
 
-    private void cancelAndRefundAmountIfWalletPaymentUsed(LoggedInUserIdentity loggedInUserIdentity, Booking booking, double cancellationFee) {
+    private void cancelAndRefundAmountIfWalletPaymentUsed(LoggedInUserIdentity loggedInUserIdentity, Booking booking,
+            double cancellationFee) {
         booking.setBookingStatus(BookingStatus.CANCELLED);
         booking.getTransactionDetail().setTransactionStatus(TransactionStatus.REFUNDED);
         if (booking.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
             Optional<Wallet> wallet = this.walletRepository.findByUserEmail(booking.getBookedBy());
             if (wallet.isPresent()) {
-                double cancellationFeeAmount=cancellationFee*booking.getNumberOfTickets();
+                double cancellationFeeAmount = cancellationFee * booking.getNumberOfTickets();
                 double bookingAmount = booking.getTransactionDetail().getAmount();
                 double currentWalletAmount = wallet.get().getBalance();
-                double totalWalletAmount = currentWalletAmount + bookingAmount-cancellationFeeAmount;
+                double totalWalletAmount = currentWalletAmount + bookingAmount - cancellationFeeAmount;
                 wallet.get().setBalance(totalWalletAmount);
                 this.walletRepository.saveAndFlush(wallet.get());
             }
         }
     }
 
-
-    public void sendMailOfBooking(BookingDto savedBookingDto, String subject,
-                                  String emailTemplateName) {
+    // include ticket id here
+    // get booking id -> get ticket ids
+    public void sendMailOfBooking(BookingDto savedBookingDto, String subject, String emailTemplateName) {
         EmailDetailsDto emailDetailDto = new EmailDetailsDto();
         emailDetailDto.setTo(savedBookingDto.getBookingUserEmail());
         emailDetailDto.setSubject(subject);
         emailDetailDto.setTemplateName(emailTemplateName);
+    
         // Prepare model for the template
         Map<String, Object> model = new HashMap<>();
         model.put("eventname", savedBookingDto.getEventDetails().getName());
@@ -349,8 +408,31 @@ public class BookingService {
         model.put("eventvenue", savedBookingDto.getEventDetails().getVenue());
         model.put("bookingid", savedBookingDto.getBookingId());
         model.put("bookingNumTickets", savedBookingDto.getNumberOfTickets());
-        emailDetailDto.setModel(model);
 
+        // Fetch the tickets associated with the booking
+        List<TicketDto> tickets = savedBookingDto.getTickets();
+        List<Long> ticketIds = new ArrayList<>(); // List to store ticket IDs
+        for (TicketDto ticket : tickets) {
+            ticketIds.add(ticket.getId());
+        }
+
+        // Convert the list of ticket IDs to a comma-separated string
+        StringBuilder ticketIdsBuilder = new StringBuilder();
+        for (Long id : ticketIds) {
+            if (ticketIdsBuilder.length() > 0) {
+                ticketIdsBuilder.append(", ");
+            }
+            ticketIdsBuilder.append(id);
+        }
+
+        // Convert the StringBuilder to a String
+        String ticketIdsString = ticketIdsBuilder.toString();
+
+        // Add the ticket IDs string to the model
+        model.put("ticketIds", ticketIdsString);
+    
+        emailDetailDto.setModel(model);
+    
         try {
             // Send the email
             emailService.sendEmail(emailDetailDto);
@@ -358,4 +440,75 @@ public class BookingService {
             System.err.println("Error sending email: " + e.getMessage());
         }
     }
+
+    public void sendMailOfBooking2(BookingDto savedBookingDto, String subject, String emailTemplateName, String customerEmail) {
+        EmailDetailsDto emailDetailDto = new EmailDetailsDto();
+        emailDetailDto.setTo(customerEmail); // Set the recipient email to the customerEmail parameter
+        emailDetailDto.setSubject(subject);
+        emailDetailDto.setTemplateName(emailTemplateName);
+    
+        // Prepare model for the template
+        Map<String, Object> model = new HashMap<>();
+        model.put("eventname", savedBookingDto.getEventDetails().getName());
+        model.put("eventdate", savedBookingDto.getEventDetails().getEventDateTime());
+        model.put("eventvenue", savedBookingDto.getEventDetails().getVenue());
+        model.put("bookingid", savedBookingDto.getBookingId());
+        model.put("bookingNumTickets", savedBookingDto.getNumberOfTickets());
+    
+        // Fetch the tickets associated with the booking
+        List<TicketDto> tickets = savedBookingDto.getTickets();
+        List<Long> ticketIds = new ArrayList<>(); // List to store ticket IDs
+        for (TicketDto ticket : tickets) {
+            ticketIds.add(ticket.getId());
+        }
+    
+        // Convert the list of ticket IDs to a comma-separated string
+        StringBuilder ticketIdsBuilder = new StringBuilder();
+        for (Long id : ticketIds) {
+            if (ticketIdsBuilder.length() > 0) {
+                ticketIdsBuilder.append(", ");
+            }
+            ticketIdsBuilder.append(id);
+        }
+    
+        // Convert the StringBuilder to a String
+        String ticketIdsString = ticketIdsBuilder.toString();
+    
+        // Add the ticket IDs string to the model
+        model.put("ticketIds", ticketIdsString);
+    
+        emailDetailDto.setModel(model);
+    
+        try {
+            // Send the email
+            emailService.sendEmail(emailDetailDto);
+        } catch (Exception e) {
+            System.err.println("Error sending email: " + e.getMessage());
+        }
+    }
+    
+    
+
+    // public void sendMailOfBooking(BookingDto savedBookingDto, String subject,
+    //         String emailTemplateName) {
+    //     EmailDetailsDto emailDetailDto = new EmailDetailsDto();
+    //     emailDetailDto.setTo(savedBookingDto.getBookingUserEmail());
+    //     emailDetailDto.setSubject(subject);
+    //     emailDetailDto.setTemplateName(emailTemplateName);
+    //     // Prepare model for the template
+    //     Map<String, Object> model = new HashMap<>();
+    //     model.put("eventname", savedBookingDto.getEventDetails().getName());
+    //     model.put("eventdate", savedBookingDto.getEventDetails().getEventDateTime());
+    //     model.put("eventvenue", savedBookingDto.getEventDetails().getVenue());
+    //     model.put("bookingid", savedBookingDto.getBookingId());
+    //     model.put("bookingNumTickets", savedBookingDto.getNumberOfTickets());
+    //     emailDetailDto.setModel(model);
+
+    //     try {
+    //         // Send the email
+    //         emailService.sendEmail(emailDetailDto);
+    //     } catch (Exception e) {
+    //         System.err.println("Error sending email: " + e.getMessage());
+    //     }
+    // }
 }

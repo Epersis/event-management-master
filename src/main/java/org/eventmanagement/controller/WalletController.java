@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/v1/wallet")
 public class WalletController {
 
@@ -24,7 +25,6 @@ public class WalletController {
     private WalletService walletService;
 
     @PutMapping("/{walletId}/add/{amount}")
-    @CrossOrigin
     public ResponseEntity<?> addMoneyToWallet(@PathVariable Long walletId, @PathVariable long amount)
             throws BadRequestException,
             EntityDoesNotExistException {
