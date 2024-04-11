@@ -79,7 +79,7 @@ public class BookingService {
             BadRequestException {
         LOGGER.debug("Ticket booking has been started.");
 
-        LoggedInUserIdentity loggedInUser = getLoggedInUserIdentity();
+        LoggedInUserIdentity loggedInUser = getLoggedInUserIdentity(); // get the logged in user details
 
         if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CASH)) {
             throw new BadRequestException("CUSTOMER can not purchase the tickets with Payment Method CASH.");
@@ -92,10 +92,12 @@ public class BookingService {
         //Validate if we have sufficient number of tickets or not for this event
         checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
 
-        //Validate if User has the required amount in Wallet
-        checkForWalletBalanceIfWalletPaymentIsUsed(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
-
-        bookingByUPIOrCard(bookingDto);
+        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
+           //Validate if User has the required amount in Wallet
+            checkForWalletBalanceIfWalletPaymentIsUsed(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
+        }
+        
+        bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
 
         // set the identity from JWT token who is performing this booking.
         bookingDto.setBookedBy(loggedInUser.whoAmI());
@@ -103,8 +105,7 @@ public class BookingService {
         //populateBookingUserDetails
         populateBookingUserDetails(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
 
-        Event event =
-                this.eventRepository.findById(bookingDto.getEventId()).orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
+        Event event = this.eventRepository.findById(bookingDto.getEventId()).orElseThrow(() -> new EntityDoesNotExistException("Event ID does not exist"));
         event.setAvailableTickets(event.getAvailableTickets() - bookingDto.getNumberOfTickets());
         
         
@@ -121,9 +122,12 @@ public class BookingService {
         this.eventRepository.saveAndFlush(event);
         BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
         savedBookingDto.setEventDetails(bookingEventDetailsDto);
-        
-        if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
-            sendMailOfBooking(savedBookingDto, "Ticket Confirmation", "email-template.ftl");
+
+
+        if (loggedInUser.role().equals(Role.ROLE_CUSTOMER) && bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.WALLET)) {
+            if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
+                sendMailOfBooking(savedBookingDto, "Ticket Confirmation", "email-template.ftl");
+            }
         }
         return Optional.of(savedBookingDto);
     }
