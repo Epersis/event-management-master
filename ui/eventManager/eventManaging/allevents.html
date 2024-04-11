@@ -118,6 +118,20 @@
                     })
                     .then(data => {
                         console.log(data)
+                        
+                        data.sort((a, b) => {
+
+                            const stateOrder = {
+                                'ACTIVE': 0,
+                                'COMPLETED': 1,
+                                'CANCELLED': 2
+                            }
+
+                            const stateA = stateOrder[a.eventState];
+                            const stateB = stateOrder[b.eventState];
+                            return stateA - stateB;
+                        })
+                        console.log(data)
                         this.events = data
                         // console.log(data.content)
                     })
@@ -167,6 +181,19 @@
                         return response.json()
                     })
                     .then(data => {
+                        console.log(data)
+                        data.sort((a, b) => {
+
+                            const stateOrder = {
+                                'ACTIVE': 0,
+                                'COMPLETED': 1,
+                                'CANCELLED': 2
+                            }
+
+                            const stateA = stateOrder[a.eventState];
+                            const stateB = stateOrder[b.eventState];
+                            return stateA - stateB;
+                        })
                         console.log(data)
                         this.events = data
                         // console.log(data.content)
