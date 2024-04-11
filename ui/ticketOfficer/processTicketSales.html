@@ -73,180 +73,19 @@
 //     window.location.href = "login.html";
 // }
 const app = Vue.createApp({
-    created() {
-        this.getAllAvailableEvents();
-        this.getUserInfo();
-    },
 
     data() {
         return {
-            music_concert: [],
-            theatre_show: [],
-            seminar: [],
-            other_event: [],
-            events: [],
-            ticketQuantity: 1,
-            paymentMethod: "WALLET",
-            walletBalance: 0,
         };
     },
     methods: {
-        logout() {  
-            localStorage.clear();
-            window.location.href = 'login.html';
-        },
-
-        getUserInfo() {
-            const URL = "http://localhost:8081/api/v1/tickets";
-
-            const headers = new Headers();
-            const customer_token = localStorage.getItem('customer_token');
-            headers.append('Authorization', `Bearer ${customer_token}`);
-
-            return fetch(URL, {
-                method: 'GET',
-                headers: headers
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                this.walletBalance = data.walletDetails.balance
-                return data
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                // Rethrow the error to be handled by the caller
-                throw error;
-            });
-        },
-
-
-        getAllAvailableEvents() {
-            const URL = `http://localhost:8081/api/v1/events`;
-
-            // Create headers object
-            const headers = new Headers();
-            const customer_token = localStorage.getItem('customer_token');
-            headers.append('Authorization', `Bearer ${customer_token}`);
-
-            // Make fetch request with headers
-            return fetch(URL, {
-                method: 'GET',
-                headers: headers
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => { 
-                for (event of data.content) {
-                    if (event.eventState == "ACTIVE") {
-                        this.events.push(event)
-                    }
-                    if (event.eventState == "ACTIVE" && event.eventType == "MUSIC_CONCERT") {
-                        this.music_concert.push(event);
-                    }
-                    if (event.eventState == "ACTIVE" && event.eventType == "THEATARE_SHOW") {
-                        this.theatre_show.push(event);
-                    }
-                    if (event.eventState == "ACTIVE" && event.eventType == "SEMINAR") {
-                        this.seminar.push(event);
-                    }
-                    if (event.eventState == "ACTIVE" && event.eventType == "OTHER") {
-                        this.other_event.push(event);
-                    }
-                }
-
-            })
-            .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-                // Handle errors (e.g., show error message)
-            });
-        },
-
-        openModal(event) {
-            const modalId = 'modal-' + event.id;
-            const modal = new bootstrap.Modal(document.getElementById(modalId));
-            modal.show();
-        },
-
-        closeModal(event) {
-            const modalId = 'modal-' + event.id;
-            const modalElement = document.getElementById(modalId);
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            this.ticketQuantity = 1;
-            modalInstance.hide();
-        },
-
-
-
-        processTicketsPurchase(event) {
-        this.getUserInfo().then(customer_info => {
-            // Create headers object
-            const headers = new Headers();
-            const customer_token = localStorage.getItem('customer_token');
-            headers.append('Authorization', `Bearer ${customer_token}`);
-            headers.append('Content-Type', 'application/json'); // Set Content-Type header
-
-            const requestBody = {
-                bookingUserEmail: customer_info.email,
-                bookingMobileNumber: customer_info.mobileNumber,
-                eventId: event.id,
-                numberOfTickets: this.ticketQuantity,
-                transactionDetail: {
-                    paymentMethod: this.paymentMethod
-                }
-            };
-
-            const URL = "http://localhost:8081/api/v1/bookings";
-            fetch(URL, {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(requestBody)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message != null) {
-                    alert(data.message);
-                }
-                else {
-                    alert("Tickets purchased successfully!")
-                    console.log('Tickets purchased successfully:', data);
-
-                    // Reload the events to get updated tickets quantity and wallet balance
-                    this.music_concert = [];
-                    this.theatre_show = [];
-                    this.seminar = [];
-                    this.other_event = [];
-                    this.events = [];
-                    this.getAllAvailableEvents();
-                    this.getUserInfo();
-                }
-
-                this.closeModal(event);
-                
-            })
-            .catch(error => {
-                console.error('Error processing tickets purchase:', error);
-            });
-
-        }).catch(error => {
-            console.error('Error fetching user info:', error);
-        });
-    },
         logout() {
-            localStorage.removeItem("token")
+            localStorage.removeItem("to_token")
             window.location.href = "../login.html"
         },
 
         checkLogin() {
-            if (!localStorage.getItem("token")) {
+            if (!localStorage.getItem("to_token")) {
                 window.location.href = "../login.html"
                 alert("Please login")
             }
