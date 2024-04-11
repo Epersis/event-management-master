@@ -32,7 +32,7 @@ public class BookingController {
 
 
     @PostMapping
-    @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
     public ResponseEntity<?> createBooking(@RequestBody @Valid BookingDto bookingDto, BindingResult bindingResult) throws BadRequestException,
             EntityDoesNotExistException {
 

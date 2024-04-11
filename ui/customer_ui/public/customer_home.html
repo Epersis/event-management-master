@@ -186,8 +186,8 @@
         },
         methods: {
             logout() {  
-                localStorage.clear();
-                window.location.href = 'login.html';
+                localStorage.removeItem("customer_token");
+                window.location.href = '../../login.html';
             },
 
             getUserInfo() {
@@ -239,14 +239,14 @@
                     return response.json();
                 })
                 .then(data => { 
-                    for (event of data.content) {
+                    for (event of data) {
                         if (event.eventState == "ACTIVE") {
                             this.events.push(event)
                         }
                         if (event.eventState == "ACTIVE" && event.eventType == "MUSIC_CONCERT") {
                             this.music_concert.push(event);
                         }
-                        if (event.eventState == "ACTIVE" && event.eventType == "THEATARE_SHOW") {
+                        if (event.eventState == "ACTIVE" && event.eventType == "THEATRE_SHOW") {
                             this.theatre_show.push(event);
                         }
                         if (event.eventState == "ACTIVE" && event.eventType == "SEMINAR") {

@@ -107,8 +107,8 @@
         },
         methods: {
             logout() {  
-                localStorage.clear();
-                window.location.href = 'login.html';
+                localStorage.removeItem("customer_token");
+                window.location.href = '../../login.html';
             },
 
             getUserInfo() {
