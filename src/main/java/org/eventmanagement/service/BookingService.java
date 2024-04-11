@@ -91,6 +91,9 @@ public class BookingService {
         // First check for Events validity, exist or not?
         validateEvent(bookingDto.getEventId(), loggedInUser.role());
 
+        // Validate if total number of tickets purchased is more than 5
+        validateTotalNumberOfTicketPurchased(bookingDto.getEventId(), bookingDto.getBookingUserEmail(), bookingDto.getNumberOfTickets());
+
         // Validate if we have sufficient number of tickets or not for this event
         checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
 
@@ -203,6 +206,19 @@ public class BookingService {
         }
         LoggedInUserIdentity result = new LoggedInUserIdentity(whoAmI, role);
         return result;
+    }
+
+    private void validateTotalNumberOfTicketPurchased(Long eventId, String bookingUserEmail, int numberOfTickets) throws BadRequestException{
+        // Fetch existing bookings for the event by the user
+        
+        List<Booking> userBookings = bookingRepository.findAllByEventIdAndBookingUserEmailAndBookingStatus(eventId, bookingUserEmail, BookingStatus.ACCEPTED);
+
+        // Calculate total tickets already booked by the user for the event
+        int totalBookedTickets = userBookings.stream().mapToInt(Booking::getNumberOfTickets).sum() + numberOfTickets;
+
+        if (totalBookedTickets > 5) {
+            throw new BadRequestException("The maximum number of tickets purchased for each event per user is 5!");
+        }
     }
 
     private void bookingByUPIOrCard(BookingDto bookingDto) {

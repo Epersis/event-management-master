@@ -32,7 +32,7 @@ public class BookingDto implements Serializable {
     private long eventId;
 
     @Min(value = 1)
-    @Max(value = 4)
+    @Max(value = 5)
     private int numberOfTickets;
 
     private Date bookingDateTime;
