@@ -73,7 +73,7 @@ public class EventController {
         return new ResponseEntity<>(savedEvent.get(), HttpStatus.OK);
     }
 
-    @PutMapping
+    @PostMapping("/updateAll")
     @PreAuthorize("hasRole('EVENT_MANAGER')")
     public ResponseEntity<?> updateAllStates() {
 
