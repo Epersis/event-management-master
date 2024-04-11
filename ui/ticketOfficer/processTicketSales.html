@@ -91,6 +91,10 @@ const app = Vue.createApp({
             }
         }
 
+    },
+    created() {
+        this.checkLogin()
+        this.fetchUser();
     }
 });
 

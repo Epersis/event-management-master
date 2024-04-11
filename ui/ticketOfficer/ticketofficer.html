@@ -159,9 +159,11 @@
                         alert("Please login")
                     }
                 }
+            },
 
-                
-
+            created() {
+                this.checkLogin()
+                this.fetchUser();
             }
 
         }).mount("#app")
