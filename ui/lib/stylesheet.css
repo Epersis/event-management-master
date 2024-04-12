@@ -186,6 +186,10 @@
     filter: alpha(opacity = 50); required for opacity to work in IE */
 }
 
+.error-text {
+    color: #4D0015;
+}
+
 a {
     color: inherit;
     text-decoration: none;
