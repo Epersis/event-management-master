@@ -34,6 +34,7 @@ import org.eventmanagement.exception.EventNotFoundException;
 import org.eventmanagement.exception.BadRequestException;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 
 
@@ -128,6 +129,63 @@ public class TicketService {
         return tickets.stream()
                 .map(ticket -> (TicketDto) objectConverter.convert(ticket, TicketDto.class))
                 .collect(Collectors.toList());
+    }
+
+    
+    public boolean isTicketEventTimeOverdue(long ticketId) throws EntityDoesNotExistException {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        // Get the ticket from the database
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Ticket not found with ID: " + ticketId);
+        }
+        // Get the booking from the ticket
+        Booking booking = ticketOptional.get().getBooking();
+
+        // Get the event from the booking using the eventId
+        Optional<Event> eventOptional = eventRepository.findById(booking.getEventId());
+        if (!eventOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Event not found with ID: " + booking.getEventId());
+        }
+        Event event = eventOptional.get();
+        Date eventDate = event.getEventDateTime();
+
+        // Convert Date to LocalDateTime
+        LocalDateTime eventLocalDateTime = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        // Check if the event's date and time is the same or after the current date and time
+        return !eventLocalDateTime.isBefore(currentDateTime);
+        
+    }
+
+    public boolean isTicketEventDateToday(long ticketId) throws EntityDoesNotExistException {
+
+        // Get the current date and time
+        LocalDate currentDate = LocalDate.now();
+
+        // Get the ticket from the database
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Ticket not found with ID: " + ticketId);
+        }
+
+        // Get the booking from the ticket
+        Booking booking = ticketOptional.get().getBooking();
+
+        // Get the event from the booking using the eventId
+        Optional<Event> eventOptional = eventRepository.findById(booking.getEventId());
+        if (!eventOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Event not found with ID: " + booking.getEventId());
+        }
+        Event event = eventOptional.get();
+
+        Date eventDate = event.getEventDateTime();
+
+        // Convert Date to LocalDateTime
+        LocalDate eventLocalDate = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        // Check if the event's date and time is the same or after the current date and time
+        return currentDate.isEqual(eventLocalDate);
     }
 
 }
