@@ -44,6 +44,8 @@
 
             data() {
                 return {
+                    errorMessage: "",
+                    successMessage: "",
                     email: '',
                     password: '',
                 }
@@ -72,8 +74,12 @@
 
                         if (!response.ok) {
                             console.log("got error")
-                            alert("Oops! It seems like you entered the wrong username or password. Please try again.")
+                            // alert("Oops! It seems like you entered the wrong username or password. Please try again.")
+                            this.errorMessage = "Oops! It seems like you entered the wrong username or password. Please try again."
                             throw new Error("got error")
+                        }
+                        else {
+                            this.successMessage = "Redirecting..."
                         }
                         return response.json()
                     })
