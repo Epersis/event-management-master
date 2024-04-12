@@ -51,7 +51,7 @@
     <!-- Page Header -->
     <div class="container-fluid page-header event-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
         <div class="container">
-            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Ongoing Events </h1>
+            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Hello {{ name }}! </h1>
         </div>
     </div>
 
@@ -160,6 +160,7 @@
 
             data() {
                 return {
+                    name: "",
                     message: "",
                     errorMessage: "",
                     on_display: "All Events",
@@ -196,6 +197,7 @@
                     })
                     .then(data => {
                         this.walletBalance = data.walletDetails.balance
+                        this.name = data.firstName + " " + data.lastName;
                         localStorage.setItem('walletId', data.walletDetails.walletId)
                         return data
                     })
