@@ -120,14 +120,14 @@
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
                             <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets per booking. </p>
+                            <p v-else-if="errorMessage != ''" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets per event. </p>
                         </p>
                     </form>
                     <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5">Buy Ticket</button>
+                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5 || ticketQuantity > event.availableTickets">Buy Ticket</button>
                     <button type="button" class="btn neg-btn rounded-pill w-auto px-5 mt-3 d-inline" @click="closeModal(event)" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -160,6 +160,7 @@
             data() {
                 return {
                     message: "",
+                    errorMessage: "",
                     on_display: "All Events",
                     display_events: [],
                     music_concert: [],
@@ -295,10 +296,7 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message != null) {
-                                this.message = data.message
-                                this.closeModal(event);
-                                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
-                                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                                this.errorMessage = data.message
                             }
                             else {
                                 // alert("Tickets purchased successfully!")
