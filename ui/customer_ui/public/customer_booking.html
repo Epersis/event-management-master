@@ -86,7 +86,12 @@
                             <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
                             <p class="details"> <span class="header"> Ticket-ID :</span> {{booking.ticketIds}}</p>
                             <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)"> Cancel Booking </button>
+                            <p class="details fw-bold"> <span class="header"> State : </span>
+                                <span v-if="booking.event.eventState == 'ACTIVE'" class="text-success"> {{ booking.event.eventState }} </span>
+                                <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
+                                <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
+                            </p>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' "> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
@@ -232,7 +237,7 @@
                         }
                         return response.json();
                     })
-                    .then(data => {     
+                    .then(data => {                            
                         const promises = data.map(booking => {
                             return this.getEventbyEventId(booking.eventId).then(event => {
                                 booking['event'] = event;
@@ -245,6 +250,7 @@
 
                         Promise.all(promises).then(bookings => {
                             bookings = bookings.filter(booking => booking !== null);
+                            console.log(bookings)
 
                             for (booking of bookings) {
                                 let ticketIds = "";
@@ -263,18 +269,33 @@
                             }
 
                             // Sort the bookings based on eventDateTime
-                            this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
+                            // this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
 
                             // Filter upcoming bookings
-                            this.upcomingBookings = bookings.filter(booking => booking.bookingStatus === "ACCEPTED");
+                            this.upcomingBookings = bookings.filter(bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime)) && (booking => booking.bookingStatus === "ACCEPTED") && (booking => booking.event.eventState === "ACTIVE"));
 
                             // Filter completed bookings
-                            this.completedBookings = bookings.filter(booking => booking.bookingStatus === "COMPLETED");
+                            this.completedBookings = bookings.filter((booking => booking.event.eventState != "ACTIVE") || ((booking => booking.bookingStatus != "ACCEPTED") && (booking => booking.bookingStatus != "PENDING")));
 
-                            this.display_bookings.push(...this.upcomingBookings)
+                            // this.completedBookings.push(bookings.filter(booking => booking.bookingStatus === "COMPLETED"));
+
                             this.display_bookings.push(...this.completedBookings)
+                            this.display_bookings.push(...this.upcomingBookings)
                             
-                            console.log(this.upcomingBookings);
+                            this.display_bookings.sort((a, b) => {
+
+                                const stateOrder = {
+                                    'ACTIVE': 0,
+                                    'COMPLETED': 1,
+                                    'CANCELLED': 2
+                                }
+
+                                const stateA = stateOrder[a.event.eventState];
+                                const stateB = stateOrder[b.event.eventState];
+                                return stateA - stateB;
+                            })
+                            
+                            console.log(this.display_bookings);
                         });
                         console.log(this.upcomingBookings)
 
