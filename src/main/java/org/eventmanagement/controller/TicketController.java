@@ -18,6 +18,7 @@ import org.eventmanagement.enums.TicketState;
 import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.exception.EntityDoesNotExistException;
 import org.eventmanagement.controller.EventController;
+import org.eventmanagement.repository.TicketRepository;
 
 import java.util.Optional;
 import java.util.List;
@@ -44,27 +45,24 @@ public class TicketController {
         }
     }
 
-    // changes the state of a ticket to ACTIVE to denote admission of the ticket
-    // @PutMapping("/admit/{ticketId}")
-    // @PreAuthorize("hasRole('TICKET_OFFICER')")
-    // public ResponseEntity<?> admitTicket(@PathVariable long ticketId) {
-    // try {
-    // ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
-    // return ResponseEntity.ok().build();
-    // } catch (EntityDoesNotExistException e) {
-    // return ResponseEntity.notFound().build();
-    // } catch (BadRequestException e) {
-    // return ResponseEntity.badRequest().body(e.getMessage());
-    // } catch (Exception e) {
-    // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    // }
-    // }
-
     @PutMapping("/admit/{ticketId}") 
     @CrossOrigin
     @PreAuthorize("hasRole('TICKET_OFFICER')")
+    // can only admit the ticket if the ticket state is INACTIVE AND the event's date is today
     public ResponseEntity<?> admitTicket(@PathVariable long ticketId) {
         try {
+            // Check if the event's date of the ticket is today
+            boolean isTicketEventDateToday = ticketService.isTicketEventDateToday(ticketId);
+            if (!isTicketEventDateToday) {
+                return ResponseEntity.badRequest().body("Cannot admit ticket for an event that is not today.");
+            }
+            // Check if the event has already begun
+            boolean isTicketEventTimeOverdue = ticketService.isTicketEventTimeOverdue(ticketId);
+            if (!isTicketEventTimeOverdue) {
+                return ResponseEntity.badRequest().body("Cannot admit ticket as the event has already begun.");
+            }
+
+            // If the event's date of the ticket is today or in the future, admit the ticket
             ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
             return ResponseEntity
                     .ok("Ticket with id " + ticketId + " has been admitted. Ticket status: " + TicketState.ACTIVE);
@@ -76,20 +74,6 @@ public class TicketController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    // if given the booking id, the Ticket Officer can issue e-tickets
-    // @PutMapping("/get_tickets/{bookingId}")
-    // @PreAuthorize("hasRole('TICKET_OFFICER')")
-    // public ResponseEntity<List<TicketDto>> getTicketsByBookingId(@PathVariable
-    // String bookingId) {
-    // try {
-    // List<TicketDto> tickets =
-    // ticketService.getTicketsByBookingId(UUID.fromString(bookingId));
-    // return ResponseEntity.ok(tickets);
-    // } catch (EntityDoesNotExistException e) {
-    // return ResponseEntity.notFound().build();
-    // }
-    // }
 
     @GetMapping("/by_booking/{bookingId}")
     @PreAuthorize("hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
