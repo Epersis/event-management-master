@@ -193,9 +193,9 @@
         <div class="event-details mx-2 mb-5 row">
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
                 <p class="mb-4 title"> About </p> 
-                <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p>
-                <p class="details mb-1"> <span class="header"> Venue :</span> {{ venue }} </p> 
+                <p class="details mb-1"> <span class="header"> Event ID :</span> {{ eventId }} </p> 
                 <p class="details mb-1"> <span class="header"> Date & Time :</span> {{ dateTime }} </p> 
+                <p class="details mb-1"> <span class="header"> Venue :</span> {{ venue }} </p>
                 <p class="details mb-1" v-for="text, key in eventTypes">
                     <span v-if="eventType == key"> <span class="header"> Event Type :</span> {{ text }} </span>
                 </p>  

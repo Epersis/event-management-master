@@ -140,12 +140,24 @@
         background-color: #4D0015;
     }
 
+    &.active {
+        color: white;
+        border-color: #4D0015;
+        background-color: #4D0015;
+    }
+
     &.neg-btn {
         color: white;
         border-color: #4D0015;
         background-color: #4D0015;
     
         &:hover {
+            color: #4D0015;
+            border-color: #4D0015;
+            background-color: white;
+        }
+
+        &.active {
             color: #4D0015;
             border-color: #4D0015;
             background-color: white;

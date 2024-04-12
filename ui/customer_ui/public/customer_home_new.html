@@ -1,0 +1,400 @@
+<!-- customer wallet -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Home</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../../lib/stylesheet.css">
+
+    <link rel="stylesheet" href="../../lib/animate/animate.min.css">
+    <link rel="stylesheet" href="../../lib/owlcarousel/assets/owl.carousel.min.css">
+    <!-- Add Axios Library -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="background" id="app">
+
+    <div class="overlay" id="overlay" style="opacity: 1;">
+
+    <!-- Nav Bar -->
+    <nav class="navbar fixed-top navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand px-3" href="customer_home.html">
+                <h1 class="fw-bold text-light">
+                    Ticket.ly
+                </h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">
+                </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav ms-auto p-4 p-lg-0"> <!-- change me to ms to position right-->
+                    <a href="customer_home.html" class="nav-item nav-link active">Home</a>
+                    <a href="customer_booking.html" class="nav-item nav-link">My Bookings</a>  
+                    <a href="customer_wallet.html" class="nav-item nav-link">My Wallet</a>
+                    <a @click="logout()" class="btn mx-2">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container-fluid page-header event-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
+        <div class="container">
+            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Upcoming Events </h1>
+        </div>
+    </div>
+
+    <div class="container-fluid mb-5" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: fit-content; ">
+        <div class="container mb-5">
+            <div class="section-header text-center w-100 mx-auto mb-5 wow fadeInUp text-white justify-content-center align-items-center" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
+                <div class="row">
+                    <h1 class="display-5 mb-3 text-white fw-bold text-center"> {{ on_display }} </h1>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    <div class="btn-group btn-group-toggle rounded w-auto" data-toggle="buttons">
+                        <button @click="display('all')" class="btn fw-medium w-auto px-3 active" id="toggle_all"> All Events </button>
+                        <button @click="display('concerts')" class="btn fw-medium w-auto px-3" id="toggle_concerts"> Concerts </button>
+                        <button @click="display('shows')" class="btn fw-medium w-auto px-3" id="toggle_shows"> Shows </button>
+                        <button @click="display('seminars')" class="btn fw-medium w-auto px-3" id="toggle_seminars"> Seminars </button>
+                        <button @click="display('others')" class="btn fw-medium w-auto px-3" id="toggle_others"> Others </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 justify-content-start wow fadeInUp " data-wow-delay="0.1s" v-if="display_events.length > 0">
+                <div class="col my-3" v-for="event in display_events">
+                    <div class="card shadow-sm m-1 h-100">
+                        <div class="card-body">
+                            <p class="mb-4 title"> {{ event.name }} </p>
+                            <p class="details"> <span class="header"> Date :</span> {{ event.eventDateTime.substring(0, 10) }} </p>
+                            <p class="details"> <span class="header"> Time : </span>
+                                <span v-if="event.eventDateTime.substring(11, 13) >= 12"> {{ event.eventDateTime.substring(11, 13)-12 }}{{ event.eventDateTime.substring(13, 16) }} pm </span>
+                                <span v-else-if="event.eventDateTime.substring(11, 13) == 0"> 12{{ event.eventDateTime.substring(13, 16) }} am </span>
+                                <span v-else> {{ event.eventDateTime.substring(11, 16) }} am</span>
+                            </p>
+                            <p class="details"> <span class="header"> Venue :</span> {{ event.venue }} </p>
+                            <p class="details"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
+                            <p class="details"> <span class="header"> Price :</span> ${{ event.ticketPrice }} </p>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="openModal(event)"> Buy Ticket </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    </div>
+
+    <div class="container pop-up align-items-center justify-content-center" id="popUp">
+        <div class="card shadow-sm m-1 w-auto">
+            <div class="card-body">
+                <div class="mb-4 title text-center"> Event has been successfully added! </div>
+                <div class="justify-content-center align-items-center d-flex">
+                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div v-for="event in events" :key="event.id" class="modal fade" :id="'modal-' + event.id" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{ event.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    
+                    <!-- Add additional details here if needed -->
+                    <p class="details mb-1"> <span class="header"> Date :</span> {{ event.eventDateTime.substring(0, 10) }} </p>
+                    <p class="details mb-1"> <span class="header"> Time : </span>
+                        <span v-if="event.eventDateTime.substring(11, 13) >= 12"> {{ event.eventDateTime.substring(11, 13)-12 }}{{ event.eventDateTime.substring(13, 16) }} pm </span>
+                        <span v-else-if="event.eventDateTime.substring(11, 13) == 0"> 12{{ event.eventDateTime.substring(13, 16) }} am </span>
+                        <span v-else> {{ event.eventDateTime.substring(11, 16) }} am</span>
+                    </p>
+                    <p class="details mb-1"> <span class="header"> Venue :</span> {{ event.venue }} </p>
+                    <p class="details mb-1"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
+                    <p class="details mb-1"> <span class="header"> Price :</span> ${{ event.ticketPrice }} </p>
+                    <form @submit.prevent="purchaseTickets(event)">
+                        <p class="details mb-1">
+                            <span class="header"> Number of Tickets :</span>
+                            <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max=4>
+                        </p>
+                    </form>
+                    <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)">Buy Ticket</button>
+                    <button type="button" class="btn neg-btn rounded-pill w-auto px-5 mt-3 d-inline" @click="closeModal(event)" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        const app = Vue.createApp({
+
+            created() {
+                this.checkLogin();
+                this.getAllAvailableEvents();
+                this.getUserInfo();
+            },
+
+            data() {
+                return {
+                    on_display: "All Events",
+                    display_events: [],
+                    music_concert: [],
+                    theatre_show: [],
+                    seminar: [],
+                    other_event: [],
+                    events: [],
+                    ticketQuantity: 1,
+                    paymentMethod: "WALLET",
+                    walletBalance: 0,
+                };
+            },
+
+            methods: {
+
+                getUserInfo() {
+                    const URL = "http://localhost:8081/api/v1/users/profile";
+
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
+
+                    return fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        this.walletBalance = data.walletDetails.balance
+                        localStorage.setItem('walletId', data.walletDetails.walletId)
+                        return data
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        // Rethrow the error to be handled by the caller
+                        throw error;
+                    });
+                },
+
+                getAllAvailableEvents() {
+                    const URL = `http://localhost:8081/api/v1/events`;
+
+                    // Create headers object
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
+
+                    // Make fetch request with headers
+                    return fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => { 
+                        for (event of data) {
+                            if (event.eventState == "ACTIVE") {
+                                this.events.push(event)
+                            }
+                            if (event.eventState == "ACTIVE" && event.eventType == "MUSIC_CONCERT") {
+                                this.music_concert.push(event);
+                            }
+                            if (event.eventState == "ACTIVE" && event.eventType == "THEATRE_SHOW") {
+                                this.theatre_show.push(event);
+                            }
+                            if (event.eventState == "ACTIVE" && event.eventType == "SEMINAR") {
+                                this.seminar.push(event);
+                            }
+                            if (event.eventState == "ACTIVE" && event.eventType == "OTHER") {
+                                this.other_event.push(event);
+                            }
+                        }
+
+                        this.display_events.push(...this.music_concert)
+                        this.display_events.push(...this.theatre_show)
+                        this.display_events.push(...this.seminar)
+                        this.display_events.push(...this.other_event)
+
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        // Handle errors (e.g., show error message)
+                    });
+                },
+
+                openModal(event) {
+                    const modalId = 'modal-' + event.id;
+                    const modal = new bootstrap.Modal(document.getElementById(modalId));
+                    modal.show();
+                },
+
+                closeModal(event) {
+                    const modalId = 'modal-' + event.id;
+                    const modalElement = document.getElementById(modalId);
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    this.ticketQuantity = 1;
+                    modalInstance.hide();
+                },
+
+                processTicketsPurchase(event) {
+                    this.getUserInfo().then(customer_info => {
+                        // Create headers object
+                        const headers = new Headers();
+                        const customer_token = localStorage.getItem('customer_token');
+                        headers.append('Authorization', `Bearer ${customer_token}`);
+                        headers.append('Content-Type', 'application/json'); 
+
+                        const requestBody = {
+                            bookingUserEmail: customer_info.email,
+                            bookingMobileNumber: customer_info.mobileNumber,
+                            eventId: event.id,
+                            numberOfTickets: this.ticketQuantity,
+                            transactionDetail: {
+                                paymentMethod: this.paymentMethod
+                            }
+                        };
+
+                        const URL = "http://localhost:8081/api/v1/bookings";
+                        fetch(URL, {
+                            method: 'POST',
+                            headers: headers,
+                            body: JSON.stringify(requestBody)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message != null) {
+                                alert(data.message);
+                            }
+                            else {
+                                alert("Tickets purchased successfully!")
+                                console.log('Tickets purchased successfully:', data);
+
+                                // Reload the events to get updated tickets quantity and wallet balance
+                                this.music_concert = [];
+                                this.theatre_show = [];
+                                this.seminar = [];
+                                this.other_event = [];
+                                this.events = [];
+                                this.getAllAvailableEvents();
+                                this.getUserInfo();
+                            }
+
+                            this.closeModal(event);
+                            
+                        })
+                        .catch(error => {
+                            console.error('Error processing tickets purchase:', error);
+                        });
+
+                    })
+                    
+                    .catch(error => {
+                        console.error('Error fetching user info:', error);
+                    });
+                },
+
+                display(type) {
+
+                    this.display_events = []
+
+                    to_toggle = ["toggle_all", "toggle_concerts", "toggle_shows", "toggle_seminars", "toggle_others"]
+                    
+                    // display by event type
+                    if (type == "all") {
+                        this.display_events.push(...this.music_concert)
+                        this.display_events.push(...this.theatre_show)
+                        this.display_events.push(...this.seminar)
+                        this.display_events.push(...this.other_event)
+                        this.on_display = "All Events"
+                    }
+                    else if (type == "concerts") {
+                        this.display_events = this.music_concert
+                        this.on_display = "Music Concerts"
+                    }
+                    else if (type == "shows") {
+                        this.display_events = this.theatre_show
+                        this.on_display = "Theatre Shows"
+                    }
+                    else if (type == "seminars") {
+                        this.display_events = this.seminar
+                        this.on_display = "Seminars"
+                    }
+                    else if (type == "others") {
+                        this.display_events = this.other_event
+                        this.on_display = "Others"
+                    }
+
+
+                    // reset navbar state
+                    for (eachId of to_toggle) {
+                        document.getElementById(eachId).setAttribute("class", "btn fw-medium w-auto px-3")
+
+                        if (eachId == "toggle_" + type) {
+                            document.getElementById(eachId).setAttribute("class", "btn fw-medium w-auto px-3 active")
+                        }
+
+                    }
+
+
+                },              
+                
+                logout() {
+                    localStorage.removeItem("customer_token")
+                    window.location.href = "../../login.html"
+                },
+
+                checkLogin() {
+                    if (!localStorage.getItem("customer_token")) {
+                        window.location.href = "../../login.html"
+                        alert("Please login")
+                    }
+                }
+
+            }
+
+        }).mount("#app")
+
+
+
+    </script>
+
+
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+    <!-- Javascript Libraries-->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- <script src="lib/wow/wow.min.js" ></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>     -->
+    
+</body>
+</html>
