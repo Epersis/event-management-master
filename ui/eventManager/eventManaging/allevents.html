@@ -30,6 +30,7 @@
             <a class="navbar-brand px-3" href="../index.html">
                 <h1 class="fw-bold text-light">
                     Ticket.ly
+                    <img src="../../img/logo.png" width="50" height="50">
                 </h1>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +58,7 @@
     <div class="container-fluid mb-5" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: fit-content; ">
         <div class="container mb-5">
             <div class="section-header text-center mx-auto mb-5 wow fadeInUp text-white" data-wow-delay="0.1s" style="max-width: 500px; visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
-                <h1 class="display-5 mb-3 text-white fw-bold text-center">All Events</h1>
+                <h1 class="display-5 mb-4 text-white fw-bold text-center">All Events</h1>
                 <button @click="addEvent()" class="btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5"> Add Event </button>
             </div>
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 justify-content-start wow fadeInUp " data-wow-delay="0.1s" v-if="events.length > 0">

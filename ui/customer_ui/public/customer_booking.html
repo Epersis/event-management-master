@@ -1,79 +1,128 @@
+<!-- customer bookings -->
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking History</title>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>My Bookings</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
     <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="../../lib/stylesheet.css">
+
+    <link rel="stylesheet" href="../../lib/animate/animate.min.css">
+    <link rel="stylesheet" href="../../lib/owlcarousel/assets/owl.carousel.min.css">
+    <!-- Add Axios Library -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
-<body>
-    <div id="app">
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <div class="container-fluid m-2">
-              <a class="navbar-brand" href="home.html" style="font-size: 30px; margin-left: 15px;">Event Master</a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                  <li class="nav-item">
-                    <a class="nav-link " aria-current="page" href="customer_home.html">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active" href="">My Booking</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="customer_wallet.html">My Wallet</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" v-on:click="logout()" href="#">Logout</a>
-                  </li>
-                </ul>
-              </div>
+
+<body class="background" id="app">
+
+    <div class="overlay" id="overlay" style="opacity: 1;">
+
+    <!-- Nav Bar -->
+    <nav class="navbar fixed-top navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand px-3" href="customer_home.html">
+                <h1 class="fw-bold text-light">
+                    Ticket.ly
+                    <img src="../../img/logo.png" width="50" height="50">
+                </h1>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon">
+                </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="navbar-nav ms-auto p-4 p-lg-0"> <!-- change me to ms to position right-->
+                    <a href="customer_home.html" class="nav-item nav-link">Home</a>
+                    <a href="customer_booking.html" class="nav-item nav-link active">My Bookings</a>  
+                    <a href="customer_wallet.html" class="nav-item nav-link">My Wallet</a>
+                    <a @click="logout()" class="btn mx-2">Logout</a>
+                </div>
             </div>
-        </nav>
-        <!-- Upcoming Booking -->
-        <div class="container mt-4">
-            <h1>Up-coming Booking</h1>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <!-- Example show card -->
-                <div v-for="booking in upcomingBookings" class="col">
-                    <div class="card h-100">
-                        <!-- <img src="https://via.placeholder.com/300" class="card-img-top" alt="Show Image"> -->
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="container-fluid page-header event-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
+        <div class="container">
+            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Bookings </h1>
+        </div>
+    </div>
+
+    <div class="container-fluid mb-5" style="display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: fit-content; ">
+        <div class="container mb-5">
+            <div class="section-header text-center w-100 mx-auto mb-5 wow fadeInUp text-white justify-content-center align-items-center" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeInUp;">
+                <div class="row">
+                    <h1 class="display-5 mb-4 text-white fw-bold text-center"> {{ on_display }} </h1>
+                </div>
+                <div class="row justify-content-center align-items-center">
+                    <div class="btn-group btn-group-toggle rounded w-auto" data-toggle="buttons">
+                        <button @click="display('all')" class="btn fw-medium w-auto px-3 active" id="toggle_all"> All </button>
+                        <button @click="display('upcoming')" class="btn fw-medium w-auto px-3" id="toggle_upcoming"> Upcoming </button>
+                        <button @click="display('past')" class="btn fw-medium w-auto px-3" id="toggle_past"> Past </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 justify-content-start wow fadeInUp " data-wow-delay="0.1s" v-if="display_bookings.length > 0">
+                <div class="col my-3" v-for="booking in display_bookings">
+                    <div class="card shadow-sm m-1 h-100">
                         <div class="card-body">
-                            <h5 class="card-title">{{ booking.event.name }}</h5>
-                            <ul class="list-unstyled">
-                                <li>Event Date and Time: {{ booking.event.eventDateTime }}</li>
-                                <li>Location: {{ booking.event.venue }}</li>
-                                <li>Ticket Quantity: {{ booking.numberOfTickets}}</li>
-                                <li>Price per Ticket: ${{ booking.event.ticketPrice }}</li>
-                            </ul>
-                            <button class="btn btn-primary" @click="processBookingCancellation(booking.bookingId)">Cancel</button>
+                            <p class="mb-4 title"> {{ booking.event.name }} </p>
+                            <p class="details"> <span class="header"> Date :</span> {{ booking.event.eventDateTime.substring(0, 10) }} </p>
+                            <p class="details"> <span class="header"> Time : </span>
+                                <span v-if="booking.event.eventDateTime.substring(11, 13) >= 12"> {{ booking.event.eventDateTime.substring(11, 13)-12 }}{{ booking.event.eventDateTime.substring(13, 16) }} pm </span>
+                                <span v-else-if="booking.event.eventDateTime.substring(11, 13) == 0"> 12{{ booking.event.eventDateTime.substring(13, 16) }} am </span>
+                                <span v-else> {{ booking.event.eventDateTime.substring(11, 16) }} am</span>
+                            </p>
+                            <p class="details"> <span class="header"> Venue :</span> {{ booking.event.venue }} </p>
+                            <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
+                            <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
-        <!-- Completed Booking -->
-        <div class="container my-4">
-            <h1>Past Booking</h1>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                <!-- Example show card -->
-                <div v-for="booking in completedBookings" class="col">
-                    <div class="card h-100">
-                        <!-- <img src="https://via.placeholder.com/300" class="card-img-top" alt="Show Image"> -->
-                        <div class="card-body">
-                            <h5 class="card-title">{{ booking.event.name }}</h5>
-                            <ul class="list-unstyled">
-                                <li>Event Date and Time: {{ booking.event.eventDateTime }}</li>
-                                <li>Location: {{ booking.event.venue }}</li>
-                                <li>Ticket Quantity: {{ booking.numberOfTickets}}</li>
-                                <li>Price per Ticket: ${{ booking.event.ticketPrice }}</li>
-                            </ul>
-                            <button class="btn btn-primary" @click="processBookingCancellation(booking.bookingId)">Cancel</button>
+    </div>
+
+    
+
+    
+    </div>
+    </div>
+
+
+    <div class="container pop-up align-items-center justify-content-center" id="popUp">
+        <div class="card shadow-sm m-1 w-50">
+            <div class="card-body">
+                <div class="mb-4 title text-center"> {{ message }} </div>
+                <div class="justify-content-center align-items-center d-flex">
+                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="container pop-up align-items-center justify-content-center" id="cfm">
+        <div class="card shadow-sm m-1 w-50">
+            <div class="card-body">
+                <div class="mb-4 title text-center"> {{ message }} </div>
+                <div class="justify-content-center align-items-center d-flex">
+                    <div class="row w-100">
+                        <div class="col-md-6">
+                            <button class="btn rounded-pill w-100 mt-2 d-inline" @click="processBookingCancellation(toCancel)"> Yes </button>
+                        </div>
+                        <div class="col-md-6">
+                            <button class="btn neg-btn rounded-pill w-100 mt-2 d-inline" @click="closeCfm()"> No </button>
                         </div>
                     </div>
                 </div>
@@ -81,183 +130,273 @@
         </div>
     </div>
 
+   
+  
 
-<!-- Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    // Check if user is logged in
-    if (localStorage.getItem('customer_token')) {
-        const customer_token = localStorage.getItem('customer_token');
-    }
-    else {
-        window.location.href = "../../login.html"
-    }
-    const app = Vue.createApp({
-        created() {
-            this.getAllBooking();
-        },
 
-        data() {
-            return {
-                upcomingBookings: [],
-                completedBookings: [],
-                bookings: []
-            };
-        },
-        methods: {
-            logout() {  
-                localStorage.removeItem("customer_token");
-                window.location.href = "../../login.html"
+    <script>
+
+        const app = Vue.createApp({
+
+            created() {
+                this.checkLogin();
+                this.getAllBooking();
             },
 
-            getUserInfo() {
-                const URL = "http://localhost:8081/api/v1/users/profile";
-
-                const headers = new Headers();
-                const customer_token = localStorage.getItem('customer_token');
-                headers.append('Authorization', `Bearer ${customer_token}`);
-
-                return fetch(URL, {
-                    method: 'GET',
-                    headers: headers
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                    // Rethrow the error to be handled by the caller
-                    throw error;
-                });
+            data() {
+                return {
+                    message: "",
+                    on_display: "All Bookings",
+                    display_bookings: [],
+                    upcomingBookings: [],
+                    completedBookings: [],
+                    bookings: [],
+                    toCancel: 0
+                };
             },
 
-            getEventbyEventId(eventId) {
-                const URL = `http://localhost:8081/api/v1/events/${eventId}`;
+            methods: {
 
-                const headers = new Headers();
-                const customer_token = localStorage.getItem('customer_token');
-                headers.append('Authorization', `Bearer ${customer_token}`);
+                getUserInfo() {
+                    const URL = "http://localhost:8081/api/v1/users/profile";
 
-                return fetch(URL, {
-                    method: 'GET',
-                    headers: headers
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {         
-                    return data
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                    // Handle errors (e.g., show error message)
-                });
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
 
-            },
+                    return fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        // Rethrow the error to be handled by the caller
+                        throw error;
+                    });
+                },
 
+                getEventbyEventId(eventId) {
+                    const URL = `http://localhost:8081/api/v1/events/${eventId}`;
 
-            getAllBooking() {
-                const URL = `http://localhost:8081/api/v1/users/bookings`;
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
 
-                // Create headers object
-                const headers = new Headers();
-                const customer_token = localStorage.getItem('customer_token');
-                headers.append('Authorization', `Bearer ${customer_token}`);
+                    return fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {         
+                        return data
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        // Handle errors (e.g., show error message)
+                    });
 
-                // Make fetch request with headers
-                fetch(URL, {
-                    method: 'GET',
-                    headers: headers
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {     
-                    const promises = data.map(booking => {
-                        return this.getEventbyEventId(booking.eventId).then(event => {
-                            booking['event'] = event;
-                            return booking;
-                        }).catch(error => {
-                            console.error('Error fetching event info:', error);
-                            return null;
+                },   
+                
+                getAllBooking() {
+                    const URL = `http://localhost:8081/api/v1/users/bookings`;
+
+                    // Create headers object
+                    const headers = new Headers();
+                    const customer_token = localStorage.getItem('customer_token');
+                    headers.append('Authorization', `Bearer ${customer_token}`);
+
+                    // Make fetch request with headers
+                    fetch(URL, {
+                        method: 'GET',
+                        headers: headers
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {     
+                        const promises = data.map(booking => {
+                            return this.getEventbyEventId(booking.eventId).then(event => {
+                                booking['event'] = event;
+                                return booking;
+                            }).catch(error => {
+                                console.error('Error fetching event info:', error);
+                                return null;
+                            });
                         });
+
+                        Promise.all(promises).then(bookings => {
+                            bookings = bookings.filter(booking => booking !== null);
+
+                            // Sort the bookings based on eventDateTime
+                            this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
+
+                            // Filter upcoming bookings
+                            this.upcomingBookings = bookings.filter(booking => booking.bookingStatus === "ACCEPTED");
+
+                            // Filter completed bookings
+                            this.completedBookings = bookings.filter(booking => booking.bookingStatus === "COMPLETED");
+
+                            this.display_bookings.push(...this.upcomingBookings)
+                            this.display_bookings.push(...this.completedBookings)
+                            
+                            console.log(this.upcomingBookings);
+                        });
+                        console.log(this.upcomingBookings)
+
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
                     });
+                },
 
-                    Promise.all(promises).then(bookings => {
-                        bookings = bookings.filter(booking => booking !== null);
+                processBookingCancellation(bookingId) {
+                    // const confirmCancellation = window.confirm("Are you sure you want to cancel this booking?");
+                    document.getElementById("cfm").setAttribute("style", "display: none")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 1")
 
-                        // Sort the bookings based on eventDateTime
-                        this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
+                    // if (confirmCancellation) {
+                        const headers = new Headers();
+                        const customer_token = localStorage.getItem('customer_token');
+                        headers.append('Authorization', `Bearer ${customer_token}`);
+                        headers.append('Content-Type', 'application/json'); // Set Content-Type header
 
-                        // Filter upcoming bookings
-                        this.upcomingBookings = bookings.filter(booking => booking.bookingStatus === "ACCEPTED");
+                        const URL = `http://localhost:8081/api/v1/bookings/${bookingId}/cancel`;
+                        fetch(URL, {
+                            method: 'POST',
+                            headers: headers,
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message != null) {
+                                // alert(data.message)
+                                this.message = "You can only cancel bookings up to 48 hours before the event."
 
-                        // Filter completed bookings
-                        this.completedBookings = bookings.filter(booking => booking.bookingStatus === "COMPLETED");
-                        
-                        console.log(this.upcomingBookings);
-                    });
-                    console.log(this.upcomingBookings)
+                                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                            }
+                            else {
+                                // alert("Booking cancelled successfully! Your refund will be credited to your wallet balance.")
+                                // console.log('Booking cancelled successfully:', data);
 
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
-            },
+                                this.message = "Booking cancelled successfully! Your refund will be credited to your wallet balance."
 
-            processBookingCancellation(bookingId) {
-            const confirmCancellation = window.confirm("Are you sure you want to cancel this booking?");
-            if (confirmCancellation) {
-                const headers = new Headers();
-                const customer_token = localStorage.getItem('customer_token');
-                headers.append('Authorization', `Bearer ${customer_token}`);
-                headers.append('Content-Type', 'application/json'); // Set Content-Type header
+                                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
 
-                const URL = `http://localhost:8081/api/v1/bookings/${bookingId}/cancel`;
-                fetch(URL, {
-                    method: 'POST',
-                    headers: headers,
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.message != null) {
-                        alert(data.message)
+                                // Reload the bookings
+                                this.upcomingBookings = [];
+                                this.completedBookings = [];
+                                this.bookings = [];
+
+                                this.getAllBooking();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error processing booking cancellation:', error);
+                        });
+                    // }
+                },
+
+                display(type) {
+
+                    this.display_bookings = []
+
+                    to_toggle = ["toggle_all", "toggle_upcoming", "toggle_past"]
+
+                    // display by event type
+                    if (type == "all") {
+                        this.display_bookings.push(...this.upcomingBookings)
+                        this.display_bookings.push(...this.completedBookings)
+                        this.on_display = "All Bookings"
                     }
-                    else {
-                        alert("Booking cancelled successfully! Your refund will be credited to your wallet balance.")
-                        console.log('Booking cancelled successfully:', data);
-
-                        // Reload the bookings
-                        this.upcomingBookings = [];
-                        this.completedBookings = [];
-                        this.bookings = [];
-
-                        this.getAllBooking();
+                    else if (type == "upcoming") {
+                        this.display_bookings = this.upcomingBookings
+                        this.on_display = "Upcoming Bookings"
                     }
-                })
-                .catch(error => {
-                    console.error('Error processing booking cancellation:', error);
-                });
+                    else if (type == "past") {
+                        this.display_bookings = this.completedBookings
+                        this.on_display = "Past Bookings"
+                    }
+
+
+                    // reset navbar state
+                    for (eachId of to_toggle) {
+                        document.getElementById(eachId).setAttribute("class", "btn fw-medium w-auto px-3")
+
+                        if (eachId == "toggle_" + type) {
+                            document.getElementById(eachId).setAttribute("class", "btn fw-medium w-auto px-3 active")
+                        }
+
+                    }
+
+
+                },  
+
+                cfmCancel(bookingId) {
+                    this.message = "Are you sure you want to cancel this booking?"
+                    this.toCancel = bookingId
+
+                    document.getElementById("cfm").setAttribute("style", "display: inline-flex")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                    
+                },
+
+                closeCfm() {
+                    document.getElementById("cfm").setAttribute("style", "display: none")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 1")
+                },
+                
+                close() {
+                    document.getElementById("popUp").setAttribute("style", "display: none")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 1")
+                    location.reload();
+                },
+
+                
+                logout() {
+                    localStorage.removeItem("customer_token")
+                    window.location.href = "../../login.html"
+                },
+
+                checkLogin() {
+                    if (!localStorage.getItem("customer_token")) {
+                        window.location.href = "../../login.html"
+                        alert("Please login")
+                    }
+                }
+
             }
-        }
+
+        }).mount("#app")
 
 
 
-        }
-    });
+    </script>
 
-    app.mount('#app');  
-</script>
 
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
+    <!-- Javascript Libraries-->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!-- <script src="lib/wow/wow.min.js" ></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>     -->
+    
 </body>
 </html>
