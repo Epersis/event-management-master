@@ -103,7 +103,7 @@ public class BookingService {
             checkForWalletBalanceIfWalletPaymentIsUsed(bookingDto, loggedInUser.role(), loggedInUser.whoAmI());
         }
 
-        bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
+        // bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
 
         // set the identity from JWT token who is performing this booking.
         bookingDto.setBookedBy(loggedInUser.whoAmI());
@@ -151,7 +151,7 @@ public class BookingService {
         // Validate if we have sufficient number of tickets or not for this event
         checkForAvailableTickets(bookingDto.getEventId(), bookingDto.getNumberOfTickets());
 
-        bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
+        // bookingByUPIOrCard(bookingDto); // if payment method is UPI or CARD, then set the status to PENDING
 
         // set the identity from JWT token who is performing this booking.
         bookingDto.setBookedBy(loggedInUser.whoAmI());
@@ -221,13 +221,13 @@ public class BookingService {
         }
     }
 
-    private void bookingByUPIOrCard(BookingDto bookingDto) {
-        if (bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.UPI)
-                || bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CARD)) {
-            bookingDto.getTransactionDetail().setTransactionStatus(TransactionStatus.PENDING);
-            bookingDto.setBookingStatus(BookingStatus.PENDING);
-        }
-    }
+    // private void bookingByUPIOrCard(BookingDto bookingDto) {
+    //     if (bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.UPI)
+    //             || bookingDto.getTransactionDetail().getPaymentMethod().equals(PaymentMethod.CARD)) {
+    //         bookingDto.getTransactionDetail().setTransactionStatus(TransactionStatus.PENDING);
+    //         bookingDto.setBookingStatus(BookingStatus.PENDING);
+    //     }
+    // }
 
     private void checkForWalletBalanceIfWalletPaymentIsUsed(BookingDto dto, Role role, String whoAmI)
             throws EntityDoesNotExistException, BadRequestException {
@@ -242,9 +242,9 @@ public class BookingService {
 
             Optional<Wallet> wallet = this.walletRepository.findByUserId(savedUser.getId());
 
-            if (wallet.isEmpty()) {
-                throw new EntityDoesNotExistException("Can't book with wallet as no wallet exist for this user.");
-            }
+            // if (wallet.isEmpty()) {
+            //     throw new EntityDoesNotExistException("Can't book with wallet as no wallet exist for this user.");
+            // }
 
             if (wallet.get().getBalance() < bookingAmount) {
                 throw new BadRequestException("You can not proceed with booking as wallet amount is lower than " +
@@ -262,6 +262,7 @@ public class BookingService {
         }
     }
 
+    // Checking
     private void populateBookingUserDetails(BookingDto bookingDto, Role role, String whoAmI)
             throws EntityDoesNotExistException, BadRequestException {
 

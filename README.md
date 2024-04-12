@@ -9,7 +9,7 @@ This functionality aims three personas:
 3. Ticket officer
 
 ## How to setup or run the project on local system.
-
+1. Backend
 - Download the Java 17 and configured.
 - Download the Apache Maven from https://maven.apache.org/download.cgi site.
 - Unzip the Apache Maven in any folder.
@@ -17,6 +17,9 @@ This functionality aims three personas:
 - Go to `target` directory.
 - There should be a jar `event-management-0.0.1-SNAPSHOT.jar` in `target` directory.
 - Run the command `java -jar event-management-0.0.1-SNAPSHOT.jar` command to start the project the embedded server.
+
+2. Users' Interfaces
+
 
 ### Testing the APIs
 
