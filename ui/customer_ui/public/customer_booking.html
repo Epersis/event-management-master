@@ -91,10 +91,13 @@
                                 <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
                                 <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
                             </p>
+                            <p v-if="booking.tickets[0].ticketState == 'INACTIVE' " class="details fw-bold"> 
+                                Tickets have been admitted.
+                            </p>
                             <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
                                 Booking was cancelled.
                             </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED'"> Cancel Booking </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'INACTIVE'"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
@@ -275,10 +278,41 @@
                             // this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
 
                             // Filter upcoming bookings
-                            this.upcomingBookings = bookings.filter(bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime)) && (booking => booking.bookingStatus === "ACCEPTED") && (booking => booking.event.eventState === "ACTIVE"));
+                            this.upcomingBookings = bookings.filter(booking =>
+                                booking.bookingStatus === "ACCEPTED" &&
+                                booking.event.eventState === "ACTIVE" &&
+                                booking.tickets.every(ticket => ticket.ticketState === "ACTIVE")
+                            );
+
+                            // // Filter upcoming bookings
+                            // this.upcomingBookings = bookings.filter((bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime))) && (booking => booking.bookingStatus === "ACCEPTED") && (booking => booking.event.eventState === "ACTIVE") && (booking => booking.tickets[0].ticketState === "ACTIVE"));
+
+                            this.upcomingBookings.sort((a, b) => {
+
+                                const stateOrder = {
+                                    'ACTIVE': 0,
+                                    'INACTIVE': 1,  
+                                }
+
+                                const stateA = stateOrder[a.tickets[0].ticketState];
+                                const stateB = stateOrder[b.tickets[0].ticketState];
+                                return stateA - stateB;
+                            })
+
+                            for (booking of bookings) {
+                                flag = true
+                                for (upcomingBooking of this.upcomingBookings) {
+                                    if (booking.bookingId == upcomingBooking.bookingId) {
+                                        flag = false
+                                    }
+                                }
+                                if (flag) {
+                                    this.completedBookings.push(booking)
+                                }
+                            }
 
                             // Filter completed bookings
-                            this.completedBookings = bookings.filter((booking => booking.event.eventState != "ACTIVE") || ((booking => booking.bookingStatus != "ACCEPTED") && (booking => booking.bookingStatus != "PENDING")));
+                            // this.completedBookings = bookings.filter((booking => booking.event.eventState != "ACTIVE") || ((booking => booking.tickets[0].ticketState != "ACTIVE") && (booking => booking.event.eventState == "ACTIVE")) || ((booking => booking.bookingStatus != "ACCEPTED") && (booking => booking.bookingStatus != "PENDING")));
 
                             // this.completedBookings.push(bookings.filter(booking => booking.bookingStatus === "COMPLETED"));
 

@@ -258,6 +258,7 @@
                 },
 
                 openModal(event) {
+                    this.errorMessage = ""
                     const modalId = 'modal-' + event.id;
                     const modal = new bootstrap.Modal(document.getElementById(modalId));
                     modal.show();
