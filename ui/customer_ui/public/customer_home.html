@@ -254,7 +254,6 @@
                     })
                     .catch(error => {
                         console.error('There was a problem with the fetch operation:', error);
-                        // Handle errors (e.g., show error message)
                     });
                 },
 
@@ -302,7 +301,6 @@
                                 this.errorMessage = data.message
                             }
                             else {
-                                // alert("Tickets purchased successfully!")
                                 console.log('Tickets purchased successfully:', data);
 
                                 this.message = "Purchased successfully!"
