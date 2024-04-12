@@ -116,20 +116,42 @@
                     <p class="details mb-1"> <span class="header"> Venue :</span> {{ event.venue }} </p>
                     <p class="details mb-1"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
                     <p class="details mb-1"> <span class="header"> Price :</span> ${{ event.ticketPrice }} </p>
-                    <form @submit.prevent="purchaseTickets(event)">
-                        <p class="details mb-1">
-                            <span class="header"> Number of Tickets :</span>
-                            <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
-                            <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                        </p>
-                    </form>
-                    <p class="details mb-1"> 
-                        <span class="header"> Issue Method :</span> 
-                        <select v-model="issueType" class="w-100">
-                            <option value="onsite"> Physical </option>
-                            <option value="eticket"> e-Ticket </option>
-                        </select>
-                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form @submit.prevent="purchaseTickets(event)">
+                                <p class="details mb-1">
+                                    <span class="header"> Number of Tickets :</span>
+                                    <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
+                                    <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> There are only {{ event.availableTickets }} tickets left. </p>
+                                    <p v-else-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only issue a maximum of 5 tickets each time. </p>
+                                </p>
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="details mb-1">
+                                <span class="header"> Issue Method :</span>
+                                <select v-model="issueType" class="form-control my-3">
+                                    <option value="onsite"> Physical </option>
+                                    <option value="eticket"> e-Ticket </option>
+                                </select>
+                            </p>
+                        </div>
+                    </div>
+                    <div v-if="issueType == 'eticket'" class="row">
+                        <div class="col-md-6">
+                            <p class="details mb-1">
+                                <span class="header"> Customer Email :</span>
+                                <input type="email" class="form-control my-3" v-model="custEmail" required>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="details mb-1">
+                                <span class="header"> Customer Mobile Number :</span>
+                                <input type="number" class="form-control my-3" v-model="custNum" required>
+                            </p>
+                        </div>
+                    </div>
+                    <p v-if="errorMessage != ''" class="details error-text mb-1"> {{ errorMessage }} </p>
 
                 </div>
                 <div class="modal-footer">
@@ -143,7 +165,9 @@
     <div class="container pop-up align-items-center justify-content-center" id="popUp">
         <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
-                <div class="mb-4 title text-center"> {{ message }} </div>
+                <div class="mb-4 title text-center"> Booking Details </div>
+                <p class="details mb-1"> <span class="header"> Booking ID :</span> {{ bookingId }} </p>
+                <p class="details mb-1"> <span class="header"> Ticket ID :</span> {{ body }} </p>
                 <div class="justify-content-center align-items-center d-flex">
                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
                 </div>
@@ -151,7 +175,6 @@
             </div>
         </div>
     </div>
-
 
     <script>
 
@@ -175,10 +198,17 @@
                     seminar: [],
                     other_event: [],
                     events: [],
-                    ticketQuantity: 1,
-                    paymentMethod: "WALLET",
+                    ticketQuantity: null,
                     walletBalance: 0,
                     issueType: "",
+                    custEmail: "",
+                    custNum: null,
+                    toEmail: "",
+                    toNum: 0,
+                    bookingUserEmail: "",
+                    bookingMobileNumber: 0,
+                    bookingId: 0,
+                    body: ""
                 };
             },
 
@@ -203,8 +233,11 @@
                         return response.json();
                     })
                     .then(data => {
+                        console.log(data)
                         this.walletBalance = data.walletDetails.balance
                         this.name = data.firstName + " " + data.lastName;
+                        this.toEmail = data.email;
+                        this.toNum = data.mobileNumber 
                         localStorage.setItem('walletId', data.walletDetails.walletId)
                         return data
                     })
@@ -268,6 +301,8 @@
 
                 openModal(event) {
                     const modalId = 'modal-' + event.id;
+                    this.ticketQuantity = null;
+                    this.issueType = null;
                     const modal = new bootstrap.Modal(document.getElementById(modalId));
                     modal.show();
                 },
@@ -276,71 +311,90 @@
                     const modalId = 'modal-' + event.id;
                     const modalElement = document.getElementById(modalId);
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                    this.ticketQuantity = 1;
                     modalInstance.hide();
                 },
 
                 processTicketsPurchase(event) {
-                    this.getUserInfo().then(customer_info => {
-                        // Create headers object
-                        const headers = new Headers();
-                        const customer_token = localStorage.getItem('customer_token');
-                        headers.append('Authorization', `Bearer ${customer_token}`);
-                        headers.append('Content-Type', 'application/json'); 
 
-                        const requestBody = {
-                            bookingUserEmail: customer_info.email,
-                            bookingMobileNumber: customer_info.mobileNumber,
-                            eventId: event.id,
-                            numberOfTickets: this.ticketQuantity,
-                            transactionDetail: {
-                                paymentMethod: this.paymentMethod
-                            }
-                        };
+                    token = localStorage.getItem("to_token")
+                    console.log(this.issueType)
 
-                        const URL = "http://localhost:8081/api/v1/bookings";
-                        fetch(URL, {
-                            method: 'POST',
-                            headers: headers,
-                            body: JSON.stringify(requestBody)
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.message != null) {
-                                this.errorMessage = data.message
-                            }
-                            else {
-                                // alert("Tickets purchased successfully!")
-                                console.log('Tickets purchased successfully:', data);
+                    if (this.issueType == "onsite") {
+                        console.log("here")
+                        this.bookingUserEmail = this.toEmail
+                        this.bookingMobileNumber = this.toNum
+                    }
+                    else if (this.issueType == "eticket") {
+                        this.bookingUserEmail = this.custEmail
+                        this.bookingMobileNumber = this.custNum
+                    }
 
-                                this.message = "Purchased successfully!"
-                                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
-                                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                    console.log(this.bookingUserEmail)
+                    console.log(this.bookingMobileNumber)
 
-                                // Reload the events to get updated tickets quantity and wallet balance
-                                this.display_events = [];
-                                this.music_concert = [];
-                                this.theatre_show = [];
-                                this.seminar = [];
-                                this.other_event = [];
-                                this.events = [];
-                                this.getAllAvailableEvents();
-                                this.getUserInfo();
-                                this.closeModal(event);
-                            }
+                    dataInput = {
+                        "bookingUserEmail": this.bookingUserEmail,
+                        "bookingMobileNumber": this.bookingMobileNumber,
+                        "eventId": event.id,
+                        "numberOfTickets": this.ticketQuantity,
+                        "transactionDetail" :{
+                            "paymentMethod":"CASH"
+                        },  
+                    }
+                    
 
+                    fetch(`http://localhost:8081/api/v1/bookings/ticket-officer/book/${this.bookingUserEmail}`, {
+                        method: "POST",
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + token
+                        },
+                        body: JSON.stringify(dataInput)
+                    })
+                    .then(response => {
+                        
+                        console.log(dataInput)
+                        console.log(response)
+                        return response.json()
+                    })
+                    .then(data =>{
+                        if (data.bookingId == null) {
                             
+                            this.errorMessage = "Purchase unsuccessful. Please check details again."
+
+                        }
+
+                        else{
+
+                            this.bookingId = data.bookingId
+
+                            for (ticket of data.tickets) {
+                                this.body += ticket.id + ", "
+                            }
+
+                            this.body = this.body.substring(0, this.body.length-2)
+
+                            // Reload the events to get updated tickets quantity and wallet balance
+                            this.display_events = [];
+                            this.music_concert = [];
+                            this.theatre_show = [];
+                            this.seminar = [];
+                            this.other_event = [];
+                            this.events = [];
+                            this.getAllAvailableEvents();
+                            this.getUserInfo();
+                            this.closeModal(event);
                             
-                        })
-                        .catch(error => {
-                            console.error('Error processing tickets purchase:', error);
-                        });
+                            document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                            document.getElementById("overlay").setAttribute("style", "opacity: 0.5") 
+
+                        }
 
                     })
-                    
                     .catch(error => {
-                        console.error('Error fetching user info:', error);
-                    });
+                        console.log(error)
+                    })
+  
                 },
 
                 display(type) {
