@@ -86,10 +86,13 @@
                             <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
                             <p class="details"> <span class="header"> Ticket-ID :</span> {{booking.ticketIds}}</p>
                             <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
-                            <p class="details fw-bold"> <span class="header"> State : </span>
+                            <p class="details fw-bold"> <span class="header"> Event Status : </span>
                                 <span v-if="booking.event.eventState == 'ACTIVE'" class="text-success"> {{ booking.event.eventState }} </span>
                                 <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
                                 <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
+                            </p>
+                            <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
+                                Booking was cancelled.
                             </p>
                             <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' "> Cancel Booking </button>
                         </div>
