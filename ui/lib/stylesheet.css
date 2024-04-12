@@ -88,13 +88,13 @@
     background-position: center;
 
     &.event-header {
-        background: url(../img/seats.jpg) top right no-repeat;
+        background: url(../img/events.jpg) top right no-repeat;
         background-size: cover;
         background-position: center;
     }
 
     &.officer-header {
-        background: url(../img/tickets.jpg) top right no-repeat;
+        background: url(../img/tickets.png) top right no-repeat;
         background-size: cover;
         background-position: center;
     }
@@ -106,7 +106,7 @@
     }
 
     &.ticket-header {
-        background: url(../img/tickets.jpg) top right no-repeat;
+        background: url(../img/tickets.png) top right no-repeat;
         background-size: cover;
         background-position: center;
     }
