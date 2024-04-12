@@ -75,6 +75,7 @@
                     <div class="card shadow-sm m-1 h-100">
                         <div class="card-body">
                             <p class="mb-4 title"> {{ booking.event.name }} </p>
+                            <p class="details"> <span class="header"> Booking-ID :</span> {{booking.bookingId}}</p>
                             <p class="details"> <span class="header"> Date :</span> {{ booking.event.eventDateTime.substring(0, 10) }} </p>
                             <p class="details"> <span class="header"> Time : </span>
                                 <span v-if="booking.event.eventDateTime.substring(11, 13) >= 12"> {{ booking.event.eventDateTime.substring(11, 13)-12 }}{{ booking.event.eventDateTime.substring(13, 16) }} pm </span>
@@ -83,6 +84,7 @@
                             </p>
                             <p class="details"> <span class="header"> Venue :</span> {{ booking.event.venue }} </p>
                             <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
+                            <p class="details"> <span class="header"> Ticket-ID :</span> {{booking.ticketIds}}</p>
                             <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
                             <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)"> Cancel Booking </button>
                         </div>
@@ -242,6 +244,22 @@
                         Promise.all(promises).then(bookings => {
                             bookings = bookings.filter(booking => booking !== null);
 
+                            for (booking of bookings) {
+                                let ticketIds = "";
+                                let tickets = booking.tickets;
+                                for (i = 0; i < tickets.length; i++) {
+                                    if (i != tickets.length-1) {
+                                        ticketIds += `${tickets[i].id}, `
+                                    }
+                                    else {
+                                        ticketIds += `${tickets[i].id}`
+                                    }
+                                    
+                                }
+                                booking['cancellationFee'] = booking.numberOfTickets * booking.event.cancellationFee
+                                booking['ticketIds'] = ticketIds;
+                            }
+
                             // Sort the bookings based on eventDateTime
                             this.upcomingBookings = bookings.sort((a, b) => new Date(a.event.eventDateTime) - new Date(b.event.eventDateTime));
 
@@ -283,22 +301,19 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message != null) {
-                                // alert(data.message)
                                 this.message = "You can only cancel bookings up to 48 hours before the event."
 
                                 document.getElementById("popUp").setAttribute("style", "display: inline-flex")
                                 document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                             }
                             else {
-                                // alert("Booking cancelled successfully! Your refund will be credited to your wallet balance.")
-                                // console.log('Booking cancelled successfully:', data);
-
                                 this.message = "Booking cancelled successfully! Your refund will be credited to your wallet balance."
 
                                 document.getElementById("popUp").setAttribute("style", "display: inline-flex")
                                 document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
 
                                 // Reload the bookings
+                                this.display_bookings = [];
                                 this.upcomingBookings = [];
                                 this.completedBookings = [];
                                 this.bookings = [];
@@ -348,7 +363,13 @@
                 },  
 
                 cfmCancel(bookingId) {
-                    this.message = "Are you sure you want to cancel this booking?"
+                    let booking = this.display_bookings.find(booking => booking.bookingId === bookingId)
+                    if (booking.cancellationFee > 0) {
+                        this.message = `Are you sure you want to cancel this booking? There would be a cancellation fee of $${booking.cancellationFee}`
+                    }
+                    else {
+                        this.message = "Are you sure you want to cancel this booking?"
+                    }
                     this.toCancel = bookingId
 
                     document.getElementById("cfm").setAttribute("style", "display: inline-flex")
