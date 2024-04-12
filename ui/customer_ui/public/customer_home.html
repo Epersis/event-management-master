@@ -120,7 +120,7 @@
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
                             <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
+                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets per booking. </p>
                         </p>
                     </form>
                     <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
