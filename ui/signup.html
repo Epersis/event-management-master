@@ -17,36 +17,47 @@
     <div id="app" class="container mt-5">
         <h1>Sign Up</h1>
         <form @submit.prevent="signup">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" v-model="email" required>
+            <div class="row mt-4">
+                <div class="mb-3 col-md-6">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="firstName" v-model="firstName" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lastName" v-model="lastName" required>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="firstName" class="form-label">First Name</label>
-                <input type="text" class="form-control" id="firstName" v-model="firstName" required>
+            <div class="row">
+                <div class="mb-3 col-md-6">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" v-model="email" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="mobileNum" class="form-label">Mobile Number</label>
+                    <input type="number" class="form-control" id="mobileNum" v-model="mobileNum" required>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="lastName" class="form-label">Last Name</label>
-                <input type="text" class="form-control" id="lastName" v-model="lastName" required>
+            <div class="row">
+                <div class="mb-3 col-md-6">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" v-model="password" required>
+                </div>
+                <div class="mb-3 col-md-6">
+                    <label for="cfmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="cfmPassword" v-model="cfmPassword" required>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" v-model="password" required>
+            <div class="row my-2">
+                <div class="mb-3 col-md-6">
+                    Role
+                    <select v-model="selectedRole">
+                        <option v-for="text, role in roles" :value="role">{{ text }}</option>
+                    </select>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="cfmPassword" class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" id="cfmPassword" v-model="cfmPassword" required>
-            </div>
-            <div class="mb-3">
-                <label for="mobileNum" class="form-label">Mobile Number</label>
-                <input type="number" class="form-control" id="mobileNum" v-model="mobileNum" required>
-            </div>
-            <div class="mb-3">
-                Role
-                <select v-model="selectedRole">
-                    <option v-for="text, role in roles" :value="role">{{ text }}</option>
-                </select>
-            </div>
+            
+            
+            
             <button type="submit" class="btn btn-primary">Sign Up</button>
         </form>
         <br>
