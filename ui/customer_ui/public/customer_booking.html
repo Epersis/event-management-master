@@ -94,7 +94,7 @@
                             <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
                                 Booking was cancelled.
                             </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' "> Cancel Booking </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED'"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
