@@ -48,21 +48,32 @@ public class TicketController {
     @PutMapping("/admit/{ticketId}") 
     @CrossOrigin
     @PreAuthorize("hasRole('TICKET_OFFICER')")
-    // can only admit the ticket if the ticket state is INACTIVE AND the event's date is today
     public ResponseEntity<?> admitTicket(@PathVariable long ticketId) {
         try {
+            StringBuilder errorMessage = new StringBuilder();
+
             // Check if the event's date of the ticket is today
             boolean isTicketEventDateToday = ticketService.isTicketEventDateToday(ticketId);
             if (!isTicketEventDateToday) {
-                return ResponseEntity.badRequest().body("Cannot admit ticket for an event that is not today.");
+                errorMessage.append("Cannot admit ticket for an event that is not today. ");
             }
             // Check if the event has already begun
             boolean isTicketEventTimeOverdue = ticketService.isTicketEventTimeOverdue(ticketId);
             if (!isTicketEventTimeOverdue) {
-                return ResponseEntity.badRequest().body("Cannot admit ticket as the event has already begun.");
+                errorMessage.append("Cannot admit ticket as the event has already begun. ");
+            }
+            // Check if the event is active
+            boolean isEventActive = ticketService.isEventActive(ticketId);
+            if (!isEventActive) {
+                errorMessage.append("Cannot admit ticket as the event has either been completed or cancelled. ");
             }
 
-            // If the event's date of the ticket is today or in the future, admit the ticket
+            if (errorMessage.length() > 0) {
+                return ResponseEntity.badRequest().body(errorMessage.toString());
+            }
+
+            // If there are no errors, admit the ticket
+            // Only a ticket that is INACTIVE can be admitted
             ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
             return ResponseEntity
                     .ok("Ticket with id " + ticketId + " has been admitted. Ticket status: " + TicketState.ACTIVE);

@@ -35,8 +35,7 @@ import org.eventmanagement.exception.BadRequestException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
-
-
+import org.eventmanagement.enums.EventState;
 
 @Service
 @Transactional
@@ -78,19 +77,6 @@ public class TicketService {
         }
         throw new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist");
     }
-
-    
-    // public void changeTicketState(long ticketId, TicketState newState) throws EntityDoesNotExistException, BadRequestException {
-    //     Ticket ticket = ticketRepository.findById(ticketId)
-    //             .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
-
-    //     if (newState == TicketState.ACTIVE) {
-    //         ticket.setTicketState(TicketState.ACTIVE);
-    //         ticketRepository.save(ticket);
-    //     } else {
-    //         throw new BadRequestException("Invalid ticket state provided for admission.");
-    //     }
-    // }
 
     public void changeTicketState(long ticketId, TicketState newState) throws EntityDoesNotExistException, BadRequestException {
         Ticket ticket = ticketRepository.findById(ticketId)
@@ -187,5 +173,25 @@ public class TicketService {
         // Check if the event's date and time is the same or after the current date and time
         return currentDate.isEqual(eventLocalDate);
     }
+    
+    public boolean isEventActive(long ticketId) throws EntityDoesNotExistException {
+        // Get the ticket from the database
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Ticket not found with ID: " + ticketId);
+        }
 
+        // Get the booking from the ticket
+        Booking booking = ticketOptional.get().getBooking();
+
+        // Get the event from the booking using the eventId
+        Optional<Event> eventOptional = eventRepository.findById(booking.getEventId());
+        if (!eventOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Event not found with ID: " + booking.getEventId());
+        }
+        Event event = eventOptional.get();
+
+        return event.getEventState() == EventState.ACTIVE;
+    
+    }
 }
