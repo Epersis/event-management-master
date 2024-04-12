@@ -1,4 +1,5 @@
 <!-- page to process on-site tickets -->
+<!-- note: no e-ticket is issued because tickets are presented on site physically-->
 
 <!DOCTYPE html>
 <html>
@@ -27,6 +28,7 @@
             <a class="navbar-brand px-3" href="ticketOfficer.html">
                 <h1 class="fw-bold text-light">
                     Ticket.ly
+                    <img src="../img/logo.png" width="50" height="50">
                 </h1>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,25 +48,25 @@
     <div class="overlay" id="overlay" style="opacity: 1;"></div>
     <div class="container-fluid page-header ticket-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
         <div class="container">
-            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Process On-Site Ticket Sales </h1>
+            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> On-Site Ticket Sales </h1>
         </div>
     </div>
     <div class="event-details mx-2 mb-5 row">
-        <div class="mb-3 col-md-6">
-            <label for="bookingUserEmail" class="form-label">Email Address</label>
+        <!-- <div class="mb-3 col-md-6">
+            <label for="bookingUserEmail" class="form-label">Ticket Officer Email Address</label>
             <input type="text" class="form-control" id="bookingUserEmail" v-model="bookingUserEmail" required>
         </div>
         <div class="mb-3 col-md-6">
             <label for="bookingMobileNumber" class="form-label">Mobile Number </label>
             <input type="text" class="form-control" id="bookingMobileNumber" v-model="bookingMobileNumber" required>
-        </div>
+        </div> -->
         <div class="mb-3 col-md-6">
             <label for="eventID" class="form-label">Event ID</label>
             <input type="number" class="form-control" id="eventID" v-model="eventID" required>
         </div>
         <div class="mb-3 col-md-6">
             <label for="numberOfTickets" class="form-label">Number of Tickets</label>
-            <input type="number" class="form-control" id="numberOfTickets" v-model="numberOfTickets" required>
+            <input type="number" class="form-control" id="numberOfTickets" v-model="numberOfTickets" required min="1" max="5">
         </div>
         <div class="row mx-2 mb-5 justify-content-center">
             <button class="mx-1 btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5" @click="processTicketSales()"> Buy Now! </button>
@@ -88,21 +90,53 @@
 const app = Vue.createApp({
     data() {
         return {
-            bookingUserEmail: "",
-            bookingMobileNumber: "",
+            email: "",
+            number: 0,
             eventID: null,
             numberOfTickets: null,
         }
     },
     methods: {
+
+        getTicketOfficerInfo() {
+
+            const URL = "http://localhost:8081/api/v1/users/profile";
+
+            const headers = new Headers();
+            const to_token = localStorage.getItem('to_token');
+            headers.append('Authorization', `Bearer ${to_token}`);
+            console.log(to_token);
+
+            return fetch(URL, {
+                method: 'GET',
+                headers: headers
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data)
+                this.email = data.email;
+                this.number = data.mobileNumber;
+                return data
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                // Rethrow the error to be handled by the caller
+                throw error;
+            });
+
+        },
+
         processTicketSales() {
             token = localStorage.getItem("to_token"),
 
             dataInput = {
-                        "bookingUserEmail": this.bookingUserEmail,
-                        "bookingMobileNumber": this.bookingMobileNumber,
-                        // "bookingUserEmail": "ticketofficer@gmail.com",
-                        // "bookingMobileNumber": 12345678,
+                        "bookingUserEmail": this.email,
+                        "bookingMobileNumber": this.number,
                         "eventId": this.eventID,
                         "numberOfTickets": this.numberOfTickets,
                         "transactionDetail" :{
@@ -111,7 +145,7 @@ const app = Vue.createApp({
                         
                 }
 
-            fetch(`http://localhost:8081/api/v1/bookings`, {
+            fetch(`http://localhost:8081/api/v1/bookings/ticket-officer/book/${this.bookingUserEmail}`, {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
@@ -120,10 +154,20 @@ const app = Vue.createApp({
                 body: JSON.stringify(dataInput)
             })
             .then(response => {
-                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
-                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                
                 console.log(dataInput)
                 console.log(response)
+                return response.json()
+            })
+            .then(data =>{
+                if(data.bookingId == null){
+                    alert("Failure to purchase ticket!")
+                }
+                else{
+                    document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                }
+
             })
             .catch(error => {
                 console.log(error)
@@ -149,6 +193,7 @@ const app = Vue.createApp({
 
     },
     created() {
+        this.getTicketOfficerInfo();
         this.checkLogin()
     }
 });

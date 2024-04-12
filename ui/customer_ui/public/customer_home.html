@@ -120,14 +120,14 @@
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
                             <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
+                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets per booking. </p>
                         </p>
                     </form>
                     <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)">Buy Ticket</button>
+                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5">Buy Ticket</button>
                     <button type="button" class="btn neg-btn rounded-pill w-auto px-5 mt-3 d-inline" @click="closeModal(event)" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -295,10 +295,10 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message != null) {
-                                // alert("oi 不会读啊 chibai");
-                                // this.message = "oi 不会读啊 chibai"
-                                // document.getElementById("popUp").setAttribute("style", "display: inline-flex")
-                                // document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+                                this.message = data.message
+                                this.closeModal(event);
+                                document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                                document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                             }
                             else {
                                 // alert("Tickets purchased successfully!")
@@ -309,6 +309,7 @@
                                 document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
 
                                 // Reload the events to get updated tickets quantity and wallet balance
+                                this.display_events = [];
                                 this.music_concert = [];
                                 this.theatre_show = [];
                                 this.seminar = [];
