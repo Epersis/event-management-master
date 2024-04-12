@@ -162,12 +162,12 @@
         </div>
     </div>
 
-    <div class="container pop-up align-items-center justify-content-center" id="popUp">
+    <div class="container pop-up align-items-center justify-content-center d-flex" id="popUp">
         <div class="card shadow-sm m-1 w-50">
-            <div class="card-body">
+            <div class="card-body justify-content-center">
                 <div class="mb-4 title text-center"> Booking Details </div>
-                <p class="details mb-1"> <span class="header"> Booking ID :</span> {{ bookingId }} </p>
-                <p class="details mb-1"> <span class="header"> Ticket ID :</span> {{ body }} </p>
+                <p class="details mb-1 px-4"> <span class="header"> Booking ID :</span> {{ bookingId }} </p>
+                <p class="details mb-1 px-4"> <span class="header"> Ticket ID :</span> {{ body }} </p>
                 <div class="justify-content-center align-items-center d-flex">
                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
                 </div>

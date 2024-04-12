@@ -117,9 +117,10 @@
     <div class="container pop-up align-items-center justify-content-center" id="cfm">
         <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
-                <div class="mb-4 title text-center"> {{ message }} </div>
+                <div class="mb-1 title text-center"> {{ message }} </div>
+                <p v-if="body != ''" class="details mb-1 text-center"> {{ body }} </span></p>
                 <div class="justify-content-center align-items-center d-flex">
-                    <div class="row w-100">
+                    <div class="row w-100 mt-3">
                         <div class="col-md-6">
                             <button class="btn rounded-pill w-100 mt-2 d-inline" @click="processBookingCancellation(toCancel)"> Yes </button>
                         </div>
@@ -154,7 +155,8 @@
                     upcomingBookings: [],
                     completedBookings: [],
                     bookings: [],
-                    toCancel: 0
+                    toCancel: 0,
+                    body: ""
                 };
             },
 
@@ -364,11 +366,9 @@
 
                 cfmCancel(bookingId) {
                     let booking = this.display_bookings.find(booking => booking.bookingId === bookingId)
+                    this.message = "Confirm booking cancellation?"
                     if (booking.cancellationFee > 0) {
-                        this.message = `Are you sure you want to cancel this booking? There would be a cancellation fee of $${booking.cancellationFee}`
-                    }
-                    else {
-                        this.message = "Are you sure you want to cancel this booking?"
+                        this.body = `There will be a cancellation fee of $${booking.cancellationFee}`
                     }
                     this.toCancel = bookingId
 
