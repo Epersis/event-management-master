@@ -5,7 +5,7 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Home</title>
+    <title>My Bookings</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue@3.2.16/dist/vue.global.prod.js"></script>
@@ -38,8 +38,8 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav ms-auto p-4 p-lg-0"> <!-- change me to ms to position right-->
-                    <a href="customer_home.html" class="nav-item nav-link active">Home</a>
-                    <a href="customer_booking.html" class="nav-item nav-link">My Bookings</a>  
+                    <a href="customer_home.html" class="nav-item nav-link">Home</a>
+                    <a href="customer_booking.html" class="nav-item nav-link active">My Bookings</a>  
                     <a href="customer_wallet.html" class="nav-item nav-link">My Wallet</a>
                     <a @click="logout()" class="btn mx-2">Logout</a>
                 </div>
@@ -50,7 +50,7 @@
     <!-- Page Header -->
     <div class="container-fluid page-header event-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
         <div class="container">
-            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Bookings </h1>
+            <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Upcoming Events </h1>
         </div>
     </div>
 
@@ -118,9 +118,9 @@
                     <form @submit.prevent="purchaseTickets(event)">
                         <p class="details mb-1">
                             <span class="header"> Number of Tickets :</span>
-                            <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
+                            <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max=4>
                             <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
+                            <p v-if="ticketQuantity > 4" class="details mb-1 error-text"> You can only purchase a maximum of 4 tickets. </p>
                         </p>
                     </form>
                     <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
