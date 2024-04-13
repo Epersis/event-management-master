@@ -123,7 +123,8 @@
     <div class="container pop-up align-items-center justify-content-center" id="popUp">
         <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
-                <div class="mb-4 title text-center"> {{ message }} </div>
+                <div class="mb-1 title text-center"> {{ message }} </div>
+                <div class="details mb-1 text-center"> {{ body }} </div>
                 <div class="justify-content-center align-items-center d-flex">
                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
                 </div>
@@ -397,13 +398,14 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message != null) {
-                                this.message = "You can only cancel bookings up to 48 hours before the event."
+                                this.message = "Error purchasing tickets"
 
                                 document.getElementById("popUp").setAttribute("style", "display: inline-flex")
                                 document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                             }
                             else {
-                                this.message = "Booking cancelled successfully! Your refund will be credited to your wallet balance."
+                                this.message = "Booking cancelled successfully!"
+                                this.body = " Your refund will be credited to your wallet balance"
 
                                 document.getElementById("popUp").setAttribute("style", "display: inline-flex")
                                 document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
@@ -483,6 +485,8 @@
                 }, 
 
                 cfmCancel(bookingId) {
+                    this.message = ""
+                    this.body = ""
                     let booking = this.display_bookings.find(booking => booking.bookingId === bookingId)
                     this.message = "Confirm booking cancellation?"
                     if (booking.cancellationFee > 0) {
@@ -497,6 +501,8 @@
                 },
 
                 closeCfm() {
+                    this.body = ""
+                    this.message = ""
                     document.getElementById("cfm").setAttribute("style", "display: none")
                     document.getElementById("overlay").setAttribute("style", "opacity: 1")
                 },
