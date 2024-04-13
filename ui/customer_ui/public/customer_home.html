@@ -85,7 +85,7 @@
                             </p>
                             <p class="details"> <span class="header"> Venue :</span> {{ event.venue }} </p>
                             <p class="details"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
-                            <p class="details"> <span class="header"> Price :</span> ${{ event.ticketPrice }} </p>
+                            <p class="details"> <span class="header"> Price :</span> ${{ event.ticketPrice.toFixed(2) }} </p>
                             <button class="btn neg-btn rounded-pill w-100 mt-3" @click="openModal(event)"> Buy Ticket </button>
                         </div>
                     </div>

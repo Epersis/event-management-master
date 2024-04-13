@@ -212,7 +212,7 @@
                 <p class="details mb-1"> <span class="header"> Total Tickets :</span> {{ totalTickets }} </p>
                 <p class="details mb-1"> <span class="header"> Tickets Sold :</span> {{ ticketsSold }} </p> 
                 <p class="details mb-1"> <span class="header"> Tickets Available :</span> {{ availableTickets }} </p>
-                <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice }} </p>
+                <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice.toFixed(2) }} </p>
                 <p class="details mb-1"> <span class="header"> Cancellation Fee (per ticket) :</span> ${{ cancellationFee }} </p>
             </div>
             <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
@@ -259,7 +259,7 @@
                             <p class="details"> <span class="header"> Venue :</span> {{ booking.event.venue }} </p>
                             <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
                             <p class="details"> <span class="header"> Ticket-ID :</span> {{ booking.ticketIds }}</p>
-                            <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
+                            <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice.toFixed(2) }} </p>
                             <p class="details fw-bold"> <span class="header"> Booking Status : </span>
                                 <span v-if="booking.bookingStatus == 'ACCEPTED'" class="text-success"> {{ booking.bookingStatus }} </span>
                                 <span v-else-if="booking.bookingStatus == 'CANCELLED'" class="text-danger"> {{ booking.bookingStatus }} </span>
@@ -350,7 +350,7 @@
                     availableTickets: 0,
                     ticketsSold: 0,
                     totalTickets: 0,
-                    ticketPrice: 0,
+                    ticketPrice: 0.0,
                     venue: "",
                     eventType: "",
                     eventState: "",
