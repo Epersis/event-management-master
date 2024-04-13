@@ -93,8 +93,9 @@
             <!-- Revenue -->
             <div class="col-4 justify-content-center align-items-center d-flex">
                 <div class="card p-4 w-100">
-                    <p class="mb-4 title"> Revenue </p>
-                    <p class="fw-bolder fs-1"> ${{ ticketsSold*ticketPrice }} </p> 
+                    <p class="mb-4 title"> Total Revenue </p>
+                    <p class="fw-bolder fs-1"> ${{ ticketsSold*ticketPrice + cancellationFeeRevenue }} </p> 
+                    <p v-if="cancellationFeeRevenue > 0" class="fw-bolder fs-6">Revenue from Cancellation Fee: ${{ cancellationFeeRevenue }} </p> 
                 </div>
             </div>
             
@@ -366,7 +367,8 @@
                     checkState: "",
                     successState: "",
                     display_bookings: [],
-                    event: {}
+                    event: {},
+                    cancellationFeeRevenue: 0
                 }
             },
 
@@ -569,7 +571,10 @@
                                     }
                                     
                                 }
-                                booking['cancellationFee'] = booking.numberOfTickets * booking.event.cancellationFee
+                                if (booking.bookingStatus == "CANCELLED") {
+                                    this.cancellationFeeRevenue += booking.cancellationFee;
+                                }
+
                                 booking['ticketIds'] = ticketIds;
                             }
 

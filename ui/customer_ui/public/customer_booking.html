@@ -279,7 +279,7 @@
                                     }
                                     
                                 }
-                                booking['cancellationFee'] = booking.numberOfTickets * booking.event.cancellationFee
+                                booking['cancellationFee_Cal'] = booking.numberOfTickets * booking.event.cancellationFee
                                 booking['ticketIds'] = ticketIds;
                             }
 
@@ -489,8 +489,8 @@
                     this.body = ""
                     let booking = this.display_bookings.find(booking => booking.bookingId === bookingId)
                     this.message = "Confirm booking cancellation?"
-                    if (booking.cancellationFee > 0) {
-                        this.body = `There will be a cancellation fee of $${booking.cancellationFee}`
+                    if (booking.cancellationFee_Cal > 0) {
+                        this.body = `There will be a cancellation fee of $${booking.cancellationFee_Cal}`
                     }
                     this.toCancel = bookingId
                     console.log("toCancel: " + this.toCancel)
