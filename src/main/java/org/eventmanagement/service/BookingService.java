@@ -394,10 +394,11 @@ public class BookingService {
         for (Ticket ticket : ticketList) {
             Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
             toChange.get().setTicketState(TicketState.ACTIVE);
-            decrementEventAttendanceCount(ticket.getId());
             this.ticketRepository.save(toChange.get());
 
         }
+
+        event.setAvailableTickets(event.getAvailableTickets() + booking.getNumberOfTickets());
 
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
@@ -406,22 +407,6 @@ public class BookingService {
         bookingDto.setEventDetails(bookingEventDetailsDto);
         sendMailOfBooking(bookingDto, "Ticket Cancellation", "cancel-booking-email-template.ftl");
         return Optional.of(bookingDto);
-    }
-
-    public void decrementEventAttendanceCount(long ticketId) throws EntityDoesNotExistException {
-        Ticket ticket = ticketRepository.findById(ticketId)
-                .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
-    
-        UUID bookingId = ticket.getBookingId();
-        Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new EntityDoesNotExistException("Booking with id " + bookingId + " does not exist"));
-    
-        Long eventId = booking.getEventId();
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new EntityDoesNotExistException("Event with id " + eventId + " does not exist"));
-    
-        event.setAttendanceCount(event.getAttendanceCount() - 1);
-        eventRepository.save(event);
     }
 
     public List<BookingDto> getUserBookings() {
