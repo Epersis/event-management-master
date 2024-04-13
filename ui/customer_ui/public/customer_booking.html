@@ -95,17 +95,16 @@
                             <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
                                 Booking was cancelled.
                             </p>
+                            <p v-else-if="checkBookingValidity(booking)" class="details fw-bold"> 
+                                Tickets have been admitted.
+                            </p>
                             <p v-else-if="isWithin48h(booking.event.eventDateTime) " class="details error-text"> 
                                 Cannot cancel booking less than 2 days before the event.
                             </p>
                             <!-- <p v-else-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
                                 Event has been {{ booking.event.eventState.toLowerCase() }}.
                             </p> -->
-                            <p v-else-if="booking.tickets[0].ticketState == 'ACTIVE' " class="details fw-bold"> 
-                                Tickets have been admitted.
-                            </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button>
-                            <!-- <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || !(booking.tickets.every(ticket => ticket.ticketState === "INACTIVE")) || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button> -->
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || checkBookingValidity(booking) || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
@@ -423,6 +422,10 @@
                             console.error('Error processing booking cancellation:', error);
                         });
                     // }
+                },
+
+                checkBookingValidity(booking) {
+                    return !(booking.tickets.every(ticket => ticket.ticketState === "INACTIVE"))  
                 },
 
                 display(type) {
