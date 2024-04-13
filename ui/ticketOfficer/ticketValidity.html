@@ -85,7 +85,8 @@
   <div class="container pop-up align-items-center justify-content-center" id="failure">
     <div class="card shadow-sm m-1 w-auto">
         <div class="card-body">
-            <div class="mb-4 title text-center"> Ticket has already been admitted </div>
+            <div class="mb-4 title text-center"> Failed to admit ticket. </div>
+            <p class="details mb-1 text-center"> {{ body }} </span></p>
             <div class="justify-content-center align-items-center d-flex">
                 <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
             </div>
@@ -99,7 +100,8 @@
 
     data () {
       return {
-        ticketID: null
+        ticketID: null,
+        body: ""
       }
     },
 
@@ -117,20 +119,25 @@
                 }
             })
             .then(response => {
-                console.log(response)
+                // console.log(response.text())
                 if (!response.ok) {
                     document.getElementById("failure").setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
-                    console.log(response)
+                    response.headers.get('Content-Type')
+                    return response.text()
+
                 }
                 else {
-                    this.ticketID = null
                     document.getElementById("success").setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                 }
-                console.log(response.json)
+                // console.log(response.json)  
                 return response.json()
                 
+            })
+            .then (data => {
+                console.log(data)
+                this.body = data
             })
             .catch(error => {
                 console.log(error)
@@ -151,6 +158,8 @@
         },
 
         close() {
+            this.body = ""
+            this.ticketID = null
             document.getElementById("success").setAttribute("style", "display: none")
             document.getElementById("failure").setAttribute("style", "display: none")
             document.getElementById("overlay").setAttribute("style", "opacity: 1")
