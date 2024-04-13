@@ -341,6 +341,16 @@ public class BookingService {
         for (Booking booking : bookings) {
             BookingDto bookingDto = (BookingDto) this.objectConverter.convert(booking, BookingDto.class);
             cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, 0);
+
+            // set tickets as active
+            List<Ticket> ticketList = booking.getTickets();
+            for (Ticket ticket : ticketList) {
+            Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
+            toChange.get().setTicketState(TicketState.ACTIVE);
+            this.ticketRepository.save(toChange.get());
+
+        }
+
             this.bookingRepository.save(booking);
             bookingDto.setEventDetails(eventDto);
             sendMailOfBooking(bookingDto, "Event Cancelled", "event-cancelled-email-template.ftl");
@@ -377,6 +387,16 @@ public class BookingService {
         }
 
         cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, event.getCancellationFee());
+
+        // set tickets as active
+        List<Ticket> ticketList = booking.getTickets();
+        for (Ticket ticket : ticketList) {
+            Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
+            toChange.get().setTicketState(TicketState.ACTIVE);
+            this.ticketRepository.save(toChange.get());
+
+        }
+
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
                 BookingEventDetailsDto.class);
@@ -391,6 +411,12 @@ public class BookingService {
         List<Booking> bookings = this.bookingRepository.findAllByBookedBy(loggedInUserIdentity.whoAmI);
         return bookings.stream().map(booking -> (BookingDto) this.objectConverter.convert(booking,
                 BookingDto.class)).collect(Collectors.toList());
+    }
+
+    public Optional<List<BookingDto>> getEventBookings(long eventId) {
+        List<Booking> bookings = this.bookingRepository.findAllByEventId(eventId);
+        return Optional.of(bookings.stream().map(booking -> (BookingDto) this.objectConverter.convert(booking,
+                BookingDto.class)).collect(Collectors.toList()));
     }
 
     private void cancelAndRefundAmountIfWalletPaymentUsed(LoggedInUserIdentity loggedInUserIdentity, Booking booking,

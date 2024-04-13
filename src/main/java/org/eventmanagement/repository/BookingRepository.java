@@ -22,5 +22,6 @@ public interface BookingRepository extends CrudRepository<Booking, UUID>, JpaRep
 
     List<Booking> findAllByEventIdAndBookingUserEmailAndBookingStatus(long eventId, String bookingUserEmail, BookingStatus bookingStatus);
 
+    List<Booking> findAllByEventId (long eventId);
     
 }

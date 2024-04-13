@@ -8,15 +8,19 @@ import java.util.stream.Collector;
 import org.eventmanagement.converter.ObjectConverter;
 import org.eventmanagement.dto.BookingEventDetailsDto;
 import org.eventmanagement.dto.EventDto;
+import org.eventmanagement.dto.BookingDto;
 import org.eventmanagement.dto.UserDetailsImpl;
 import org.eventmanagement.enums.BookingStatus;
 import org.eventmanagement.enums.EventState;
+import org.eventmanagement.enums.TicketState;
 import org.eventmanagement.exception.BadRequestException;
 import org.eventmanagement.exception.EntityDoesNotExistException;
 import org.eventmanagement.model.Booking;
 import org.eventmanagement.model.Event;
+import org.eventmanagement.model.Ticket;
 import org.eventmanagement.repository.BookingRepository;
 import org.eventmanagement.repository.EventRepository;
+import org.eventmanagement.repository.TicketRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +45,9 @@ public class EventService {
 
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private TicketRepository ticketRepository;
 
     @Autowired
     private BookingService bookingService;
@@ -109,6 +116,20 @@ public class EventService {
             if (savedEvent.isPresent()) {
                 if ((savedEvent.get().getEventDateTime().getTime() < currentDate.getTime()) && !(savedEvent.get().getEventState().equals(EventState.CANCELLED))) {
                     savedEvent.get().setEventState(EventState.COMPLETED);
+
+                    // set tickets as active
+                    List<Booking> bookings = this.bookingRepository.findAllByEventId(i);
+
+                    for (Booking booking : bookings) {
+                        List<Ticket> ticketList = booking.getTickets();
+                        for (Ticket ticket : ticketList) {
+                            Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
+                            toChange.get().setTicketState(TicketState.ACTIVE);
+                            this.ticketRepository.save(toChange.get());
+
+                        }
+                    }
+
                     Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
                 }
             }

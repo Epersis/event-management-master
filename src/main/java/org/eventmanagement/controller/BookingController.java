@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -61,6 +62,14 @@ public class BookingController {
     public ResponseEntity<?> getBookingById(@PathVariable String bookingId) throws BadRequestException,
             EntityDoesNotExistException {
         Optional<BookingDto> savedBookingDto = this.bookingService.getBookingDetails(bookingId);
+        return new ResponseEntity<>(savedBookingDto.get(), HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/event/{eventId}")
+    @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
+    public ResponseEntity<?> getBookingByEvent(@PathVariable long eventId) throws BadRequestException,
+            EntityDoesNotExistException {
+        Optional<List<BookingDto>> savedBookingDto = this.bookingService.getEventBookings(eventId);
         return new ResponseEntity<>(savedBookingDto.get(), HttpStatus.CREATED);
     }
 
