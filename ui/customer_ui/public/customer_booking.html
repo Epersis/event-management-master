@@ -91,12 +91,12 @@
                                 <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
                                 <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
                             </p>
-                            <p v-if="isWithin48h(booking.event.eventDateTime) " class="details fw-bold"> 
-                                Cannot cancel booking 48h before event.
+                            <p v-if="isWithin48h(booking.event.eventDateTime) " class="details error-text"> 
+                                Cannot cancel booking less than 2 days before the event.
                             </p>
-                            <p v-else-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
+                            <!-- <p v-else-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
                                 Event has been {{ booking.event.eventState.toLowerCase() }}.
-                            </p>
+                            </p> -->
                             <p v-else-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
                                 Booking was cancelled.
                             </p>

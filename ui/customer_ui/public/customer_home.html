@@ -86,7 +86,8 @@
                             <p class="details"> <span class="header"> Venue :</span> {{ event.venue }} </p>
                             <p class="details"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
                             <p class="details"> <span class="header"> Price :</span> ${{ event.ticketPrice.toFixed(2) }} </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="openModal(event)"> Buy Ticket </button>
+                            <p v-if=" isWithin24h(event.eventDateTime) " class="details mb-1 error-text"> Online purchase not available 24h before the event. </p>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="openModal(event)" :disabled="isWithin24h(event.eventDateTime)"> Buy Ticket </button>
                         </div>
                     </div>
                 </div>
@@ -120,8 +121,7 @@
                         <p class="details mb-1">
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
-                            <p v-if=" isWithin24h(event.eventDateTime) " class="details mb-1 error-text"> Online purchase not available 24h before the event. </p>
-                            <p v-else-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
+                            <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
                             <p v-else-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
                             <p v-else-if="errorMessage != ''" class="details mb-1 error-text"> {{ errorMessage }} </p>
                         </p>
