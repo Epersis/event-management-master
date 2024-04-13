@@ -91,13 +91,13 @@
                                 <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
                                 <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
                             </p>
-                            <p v-if="booking.tickets[0].ticketState == 'INACTIVE' " class="details fw-bold"> 
-                                Tickets have been admitted.
+                            <p v-if="booking.tickets[0].ticketState == 'ACTIVE' " class="details fw-bold"> 
+                                Tickets are no longer valid.
                             </p>
                             <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
                                 Booking was cancelled.
                             </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'INACTIVE'"> Cancel Booking </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'ACTIVE'"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
@@ -282,7 +282,7 @@
                             this.upcomingBookings = bookings.filter(booking =>
                                 booking.bookingStatus === "ACCEPTED" &&
                                 booking.event.eventState === "ACTIVE" &&
-                                booking.tickets[0].ticketState === "ACTIVE"
+                                booking.tickets[0].ticketState === "INACTIVE"
                             );
 
                             // // Filter upcoming bookings
@@ -354,6 +354,7 @@
                     // const confirmCancellation = window.confirm("Are you sure you want to cancel this booking?");
                     document.getElementById("cfm").setAttribute("style", "display: none")
                     document.getElementById("overlay").setAttribute("style", "opacity: 1")
+                    console.log(bookingId)
 
                     // if (confirmCancellation) {
                         const headers = new Headers();
@@ -390,6 +391,7 @@
                             }
                         })
                         .catch(error => {
+                            console.log(error)
                             console.error('Error processing booking cancellation:', error);
                         });
                     // }
@@ -437,6 +439,7 @@
                         this.body = `There will be a cancellation fee of $${booking.cancellationFee}`
                     }
                     this.toCancel = bookingId
+                    console.log("toCancel: " + this.toCancel)
 
                     document.getElementById("cfm").setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")

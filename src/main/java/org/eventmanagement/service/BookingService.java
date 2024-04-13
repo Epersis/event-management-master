@@ -388,14 +388,14 @@ public class BookingService {
 
         cancelAndRefundAmountIfWalletPaymentUsed(loggedInUserIdentity, booking, event.getCancellationFee());
 
-        // set tickets as active
-        List<Ticket> ticketList = booking.getTickets();
-        for (Ticket ticket : ticketList) {
-            Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
-            toChange.get().setTicketState(TicketState.ACTIVE);
-            this.ticketRepository.save(toChange.get());
+        // // set tickets as active
+        // List<Ticket> ticketList = booking.getTickets();
+        // for (Ticket ticket : ticketList) {
+        //     Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
+        //     toChange.get().setTicketState(TicketState.ACTIVE);
+        //     this.ticketRepository.save(toChange.get());
 
-        }
+        // }
 
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,

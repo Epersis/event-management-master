@@ -132,6 +132,23 @@ public class EventService {
 
                     Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
                 }
+                else if (savedEvent.get().getEventState().equals(EventState.CANCELLED)) {
+
+                    // set tickets as active
+                    List<Booking> bookings = this.bookingRepository.findAllByEventId(i);
+
+                    for (Booking booking : bookings) {
+                        List<Ticket> ticketList = booking.getTickets();
+                        for (Ticket ticket : ticketList) {
+                            Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
+                            toChange.get().setTicketState(TicketState.ACTIVE);
+                            this.ticketRepository.save(toChange.get());
+
+                        }
+                    }
+
+                    Event updatedSavedEvent = this.eventRepository.saveAndFlush(savedEvent.get());
+                }
             }
         }
 
