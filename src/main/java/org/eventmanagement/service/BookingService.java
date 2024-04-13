@@ -436,6 +436,9 @@ public class BookingService {
                 double totalWalletAmount = currentWalletAmount + bookingAmount - cancellationFeeAmount;
                 wallet.get().setBalance(totalWalletAmount);
                 this.walletRepository.saveAndFlush(wallet.get());
+
+                // Update cancellationFee in booking
+                booking.setCancellationFee(cancellationFeeAmount);
             }
         }
     }
