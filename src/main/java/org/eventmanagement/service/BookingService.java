@@ -173,11 +173,11 @@ public class BookingService {
         booking.setTickets(tickets);
 
         booking.getTransactionDetail().setBooking(booking);
+        booking.setBookingStatus(BookingStatus.ACCEPTED);
         Booking savedBooking = this.bookingRepository.saveAndFlush(booking);
         this.eventRepository.saveAndFlush(event);
         BookingDto savedBookingDto = (BookingDto) this.objectConverter.convert(savedBooking, BookingDto.class);
         savedBookingDto.setEventDetails(bookingEventDetailsDto);
-        savedBookingDto.setBookingStatus(BookingStatus.ACCEPTED);
         if (savedBookingDto.getBookingStatus().equals(BookingStatus.ACCEPTED)) {
             sendMailOfBooking2(savedBookingDto, "Ticket Confirmation", "email-template.ftl", customerEmail);
         }

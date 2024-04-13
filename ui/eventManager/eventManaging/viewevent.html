@@ -584,6 +584,21 @@
 
                             this.display_bookings.sort((a, b) => {
 
+
+                                const stateOrder1 = {
+                                    'ACCEPTED': 0,
+                                    'PENDING': 1,
+                                    'FAILED': 2,
+                                    'CANCELLED': 3
+                                }
+
+                                const stateA = stateOrder1[a.bookingStatus];
+                                const stateB = stateOrder1[b.bookingStatus];
+
+                                if (stateA != stateB) {
+                                    return stateA - stateB
+                                }
+
                                 const stateOrder = {
                                     'ACTIVE': 1,
                                     'INACTIVE': 0
@@ -594,20 +609,6 @@
 
                                 if (state1 != state2) {
                                     return state1 - state2;
-                                }
-
-                                const stateOrder1 = {
-                                    'ACCEPTED': 3,
-                                    'PENDING': 2,
-                                    'FAILED': 1,
-                                    'CANCELLED': 0
-                                }
-
-                                const stateA = stateOrder1[a.bookingStatus];
-                                const stateB = stateOrder1[b.bookingStatus];
-
-                                if (stateA != stateB) {
-                                    return stateA - stateB
                                 }
 
                                 if (a.bookingDateTime < b.bookingDateTime) {

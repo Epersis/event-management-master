@@ -86,7 +86,7 @@
                             <p class="details"> <span class="header"> Venue :</span> {{ event.venue }} </p>
                             <p class="details"> <span class="header"> Available Tickets :</span> {{ event.availableTickets }} </p>
                             <p class="details"> <span class="header"> Price :</span> ${{ event.ticketPrice.toFixed(2) }} </p>
-                            <p v-if=" isWithin24h(event.eventDateTime) " class="details mb-1 error-text"> Online purchase not available 24h before the event. </p>
+                            <p v-if=" isWithin24h(event.eventDateTime) " class="details mb-1 error-text"> Online purchase not available 24h before the event </p>
                             <button class="btn neg-btn rounded-pill w-100 mt-3" @click="openModal(event)" :disabled="isWithin24h(event.eventDateTime)"> Buy Ticket </button>
                         </div>
                     </div>
