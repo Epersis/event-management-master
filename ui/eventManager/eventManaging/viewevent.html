@@ -265,12 +265,6 @@
                                 <span v-else-if="booking.bookingStatus == 'CANCELLED'" class="text-danger"> {{ booking.bookingStatus }} </span>
                                 <span v-else class="text-warning"> {{ booking.bookingStatus }} </span>
                             </p>
-                            <p v-if="booking.tickets[0].ticketState == 'ACTIVE' " class="details fw-bold">
-                                Tickets are no longer valid.
-                            </p>
-                            <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold">
-                                Booking was cancelled.
-                            </p>
                         </div>
                     </div>
                 </div>
