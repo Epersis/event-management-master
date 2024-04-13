@@ -194,7 +194,7 @@ public class TicketService {
         return currentDate.isEqual(eventLocalDate);
     }
     
-    public boolean isEventActive(long ticketId) throws EntityDoesNotExistException {
+    public boolean isEventCancelled(long ticketId) throws EntityDoesNotExistException {
         // Get the ticket from the database
         Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
         if (!ticketOptional.isPresent()) {
@@ -211,7 +211,42 @@ public class TicketService {
         }
         Event event = eventOptional.get();
 
-        return event.getEventState() == EventState.ACTIVE;
+        return event.getEventState() == EventState.CANCELLED;
     
+    }
+
+    public boolean isEventCompleted(long ticketId) throws EntityDoesNotExistException {
+        // Get the ticket from the database
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Ticket not found with ID: " + ticketId);
+        }
+
+        // Get the booking from the ticket
+        Booking booking = ticketOptional.get().getBooking();
+
+        // Get the event from the booking using the eventId
+        Optional<Event> eventOptional = eventRepository.findById(booking.getEventId());
+        if (!eventOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Event not found with ID: " + booking.getEventId());
+        }
+        Event event = eventOptional.get();
+
+        return event.getEventState() == EventState.COMPLETED;
+    
+    }
+
+    public boolean isBookingValid(long ticketId) throws BadRequestException, EntityDoesNotExistException{ 
+        // Get the ticket from the database
+        Optional<Ticket> ticketOptional = ticketRepository.findById(ticketId);
+        if (!ticketOptional.isPresent()) {
+            throw new EntityDoesNotExistException("Ticket not found with ID: " + ticketId);
+        }
+
+        // Get the booking from the ticket
+        Booking booking = ticketOptional.get().getBooking();
+
+        return booking.getBookingStatus() == BookingStatus.ACCEPTED;
+
     }
 }

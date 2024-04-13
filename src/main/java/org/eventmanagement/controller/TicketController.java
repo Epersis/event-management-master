@@ -23,6 +23,7 @@ import org.eventmanagement.repository.TicketRepository;
 import java.util.Optional;
 import java.util.List;
 import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
@@ -52,37 +53,76 @@ public class TicketController {
         try {
             StringBuilder errorMessage = new StringBuilder();
 
-            // Check if the event's date of the ticket is today
+            //ticket info
+            Optional<TicketDto> ticket = ticketService.getTicketById(ticketId);
+
+            // 1. check for booking validity
+            // 2. check for event validity (active, today, ongoing)
+            // 3. check for ticket validity (if alr active)
+
+            boolean isBookingValid = ticketService.isBookingValid(ticketId);
+            boolean isEventCompleted = ticketService.isEventCompleted(ticketId);
+            boolean isEventCancelled = ticketService.isEventCancelled(ticketId);
             boolean isTicketEventDateToday = ticketService.isTicketEventDateToday(ticketId);
-            if (!isTicketEventDateToday) {
-                errorMessage.append("Cannot admit ticket for an event that is not today. ");
-            }
-            // Check if the event has already begun
             boolean isTicketEventTimeOverdue = ticketService.isTicketEventTimeOverdue(ticketId);
-            if (!isTicketEventTimeOverdue) {
-                errorMessage.append("Cannot admit ticket as the event has already begun. ");
-            }
-            // Check if the event is active
-            boolean isEventActive = ticketService.isEventActive(ticketId);
-            if (!isEventActive) {
-                errorMessage.append("Cannot admit ticket as the event has either been completed or cancelled. ");
+
+            //check for valid booking 
+            if (!isBookingValid) {
+                errorMessage.append("Booking is not active.");
             }
 
+            // Check if the event is active
+            else if (isEventCompleted) {
+                errorMessage.append("Event is over.");
+            }
+
+            else if (isEventCancelled) {
+                errorMessage.append("Event has been cancelled.");
+            }
+
+            // Check if the event's date of the ticket is today
+            else if (!isTicketEventDateToday) {
+                errorMessage.append("Event is not open for admission.");
+            }
+
+            // Check if the event has already begun
+            else if (!isTicketEventTimeOverdue) {
+                errorMessage.append("Event has already begun.");
+            }
+            
+
             if (errorMessage.length() > 0) {
-                return ResponseEntity.badRequest().body(errorMessage.toString());
+                Map<String, Object> response = new HashMap<>();
+                response.put("errorMessage", errorMessage);
+                response.put("ticket", ticket); 
+                return ResponseEntity.badRequest().body(response);
             }
 
             // If there are no errors, admit the ticket
             // Only a ticket that is INACTIVE can be admitted
             ticketService.changeTicketState(ticketId, TicketState.ACTIVE);
-            return ResponseEntity
-                    .ok("Ticket with id " + ticketId + " has been admitted. Ticket status: " + TicketState.ACTIVE);
+            // return ResponseEntity
+            //         .ok("Ticket with id " + ticketId + " has been admitted. Ticket status: " + TicketState.ACTIVE);
+            
+            return ResponseEntity.ok(ticket);
+
         } catch (EntityDoesNotExistException e) {
-            return ResponseEntity.notFound().build();
+            Optional<TicketDto> ticket = ticketService.getTicketById(ticketId);
+            return new ResponseEntity<>(ticket.get(), HttpStatus.NOT_FOUND);
+            // return ResponseEntity.notFound().build();
         } catch (BadRequestException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            Optional<TicketDto> ticket = ticketService.getTicketById(ticketId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("errorMessage", e.getMessage());
+            response.put("ticket", ticket); 
+            return ResponseEntity.badRequest().body(response);
+
+            // return new ResponseEntity<>(ticket.get(), HttpStatus.BAD_REQUEST);
+            // return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Optional<TicketDto> ticket = ticketService.getTicketById(ticketId);
+            return new ResponseEntity<>(ticket.get(), HttpStatus.INTERNAL_SERVER_ERROR);
+            // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 

@@ -104,7 +104,8 @@
                             <p v-else-if="booking.tickets[0].ticketState == 'ACTIVE' " class="details fw-bold"> 
                                 Tickets have been admitted.
                             </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'ACTIVE' || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button>
+                            <!-- <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || !(booking.tickets.every(ticket => ticket.ticketState === "INACTIVE")) || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button> -->
                         </div>
                     </div>
                 </div>
@@ -289,7 +290,7 @@
                             this.upcomingBookings = bookings.filter(booking =>
                                 booking.bookingStatus === "ACCEPTED" &&
                                 booking.event.eventState === "ACTIVE" &&
-                                booking.tickets[0].ticketState === "INACTIVE"
+                                booking.tickets.every(ticket => ticket.ticketState === "INACTIVE")
                             );
 
                             // // Filter upcoming bookings
@@ -310,27 +311,19 @@
                                 }
                             }
 
-                            // Filter completed bookings
-                            // this.completedBookings = bookings.filter((booking => booking.event.eventState != "ACTIVE") || ((booking => booking.tickets[0].ticketState != "ACTIVE") && (booking => booking.event.eventState == "ACTIVE")) || ((booking => booking.bookingStatus != "ACCEPTED") && (booking => booking.bookingStatus != "PENDING")));
+                            this.completedBookings.sort((a, b) => {
 
-                            // this.completedBookings.push(bookings.filter(booking => booking.bookingStatus === "COMPLETED"));
+                                // const stateOrder = {
+                                //     'ACTIVE': 1,
+                                //     'INACTIVE': 0
+                                // }
 
-                            this.display_bookings.push(...this.completedBookings)
-                            this.display_bookings.push(...this.upcomingBookings)
+                                // const state1 = stateOrder[a.tickets[0].ticketState];
+                                // const state2 = stateOrder[b.tickets[0].ticketState];
 
-                            this.display_bookings.sort((a, b) => {
-
-                                const stateOrder = {
-                                    'ACTIVE': 1,
-                                    'INACTIVE': 0
-                                }
-
-                                const state1 = stateOrder[a.tickets[0].ticketState];
-                                const state2 = stateOrder[b.tickets[0].ticketState];
-
-                                if (state1 != state2) {
-                                    return state1 - state2;
-                                }
+                                // if (state1 != state2) {
+                                //     return state1 - state2;
+                                // }
 
                                 const stateOrder2 = {
                                     'ACTIVE': 0,
@@ -368,6 +361,11 @@
                                 }
 
                             })
+                            
+                            
+                            this.display_bookings.push(...this.upcomingBookings)
+                            this.display_bookings.push(...this.completedBookings)
+                            
                             
                             
                             console.log(this.display_bookings);
