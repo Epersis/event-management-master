@@ -38,6 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -393,6 +394,7 @@ public class BookingService {
         for (Ticket ticket : ticketList) {
             Optional<Ticket> toChange = this.ticketRepository.findById(ticket.getId());
             toChange.get().setTicketState(TicketState.ACTIVE);
+            decrementEventAttendanceCount(ticket.getId());
             this.ticketRepository.save(toChange.get());
 
         }
@@ -404,6 +406,22 @@ public class BookingService {
         bookingDto.setEventDetails(bookingEventDetailsDto);
         sendMailOfBooking(bookingDto, "Ticket Cancellation", "cancel-booking-email-template.ftl");
         return Optional.of(bookingDto);
+    }
+
+    public void decrementEventAttendanceCount(long ticketId) throws EntityDoesNotExistException {
+        Ticket ticket = ticketRepository.findById(ticketId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Ticket with id " + ticketId + " does not exist"));
+    
+        UUID bookingId = ticket.getBookingId();
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Booking with id " + bookingId + " does not exist"));
+    
+        Long eventId = booking.getEventId();
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new EntityDoesNotExistException("Event with id " + eventId + " does not exist"));
+    
+        event.setAttendanceCount(event.getAttendanceCount() - 1);
+        eventRepository.save(event);
     }
 
     public List<BookingDto> getUserBookings() {
