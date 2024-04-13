@@ -38,8 +38,9 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <div class="navbar-nav ms-auto p-4 p-lg-0"> <!-- change me to ms to position right-->
                     <a href="ticketOfficer.html" class="nav-item nav-link active">Home</a>
-                    <a href="ticketValidity.html" class="nav-item nav-link">Validation</a>  
-                    <a href="ticket_sales.html" class="nav-item nav-link">Sales</a>
+                    <a href="ticketSales.html" class="nav-item nav-link">Sales</a>
+                    <a href="ticketValidity.html" class="nav-item nav-link">Validate</a>  
+                    <a href="ticketAdmission.html" class="nav-item nav-link">Admission</a>
                     <a class="btn mx-2" @click="logout()">Logout</a>
                 </div>
             </div>
@@ -64,6 +65,16 @@
                     <div class="col-lg-4 col-md-6 my-3">
                         <div class="card shadow-sm m-1 w-100 h-100">
                             <div class="card-body">
+                                <div class="mb-4 title text-center"> Issue Tickets </div>
+                                <div class="justify-content-center align-items-center d-flex">
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('ticketSales.html')"> Ok </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 my-3">
+                        <div class="card shadow-sm m-1 w-100 h-100">
+                            <div class="card-body">
                                 <div class="mb-4 title text-center"> Ticket Validation </div>
                                 <div class="justify-content-center align-items-center d-flex">
                                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('ticketValidity.html')"> Ok </button>
@@ -74,23 +85,14 @@
                     <div class="col-lg-4 col-md-6 my-3">
                         <div class="card shadow-sm m-1 w-100 h-100">
                             <div class="card-body">
-                                <div class="mb-4 title text-center"> Process On-Site Ticket Sales</div>
+                                <div class="mb-4 title text-center"> Event Admission </div>
                                 <div class="justify-content-center align-items-center d-flex">
-                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('processTicketSales.html')"> Ok </button>
+                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('ticketAdmission.html')"> Ok </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-4 col-md-6 my-3">
-                        <div class="card shadow-sm m-1 w-100 h-100">
-                            <div class="card-body">
-                                <div class="mb-4 title text-center"> Issue E-Tickets </div>
-                                <div class="justify-content-center align-items-center d-flex">
-                                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="redirect('issueTickets.html')"> Ok </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
 
