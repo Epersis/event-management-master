@@ -399,6 +399,7 @@ public class BookingService {
         }
 
         event.setAvailableTickets(event.getAvailableTickets() + booking.getNumberOfTickets());
+        this.eventRepository.saveAndFlush(event);
 
         Booking updatedBooking = this.bookingRepository.save(booking);
         BookingEventDetailsDto bookingEventDetailsDto = (BookingEventDetailsDto) this.objectConverter.convert(event,
