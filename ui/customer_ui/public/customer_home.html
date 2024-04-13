@@ -120,15 +120,17 @@
                         <p class="details mb-1">
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
-                            <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-else-if="errorMessage != ''" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets per event. </p>
+                            <p v-if=" isWithin24h(event.eventDateTime) " class="details mb-1 error-text"> Online purchase not available 24h before the event. </p>
+                            <p v-else-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
+                            <p v-else-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
+                            <p v-else-if="errorMessage != ''" class="details mb-1 error-text"> {{ errorMessage }} </p>
                         </p>
                     </form>
                     <p class="details mb-1"> <span class="header"> Wallet Balance :</span> ${{ walletBalance }} </p>
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5 || ticketQuantity > event.availableTickets">Buy Ticket</button>
+                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5 || ticketQuantity > event.availableTickets || isWithin24h(event.eventDateTime)">Buy Ticket</button>
                     <button type="button" class="btn neg-btn rounded-pill w-auto px-5 mt-3 d-inline" @click="closeModal(event)" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -257,6 +259,25 @@
                     });
                 },
 
+                isWithin24h(checkTime) {
+
+                    // Convert eventDateTime to a JavaScript Date object
+                    const eventDate = new Date(checkTime);
+
+                    // Get the current date and time
+                    const currentDate = new Date();
+
+                    // Calculate the difference in milliseconds between eventDateTime and the current time
+                    const timeDifference = eventDate.getTime() - currentDate.getTime();
+
+                    // Convert the time difference to hours
+                    const hoursDifference = timeDifference / (1000 * 3600);
+
+                    // Return true if the event is less than 24 hours away, otherwise false
+                    return hoursDifference <= 24;
+
+                },  
+
                 openModal(event) {
                     this.errorMessage = ""
                     const modalId = 'modal-' + event.id;
@@ -299,7 +320,8 @@
                         .then(response => response.json())
                         .then(data => {
                             if (data.message != null) {
-                                this.errorMessage = data.message
+                                console.log(data.message)
+                                this.errorMessage = "You can only purchase a maximum of 5 tickets per event."
                             }
                             else {
                                 console.log('Tickets purchased successfully:', data);

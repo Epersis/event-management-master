@@ -83,6 +83,10 @@
                 <label for="venue" class="form-label">Venue</label>
                 <input type="text" class="form-control" id="venue" v-model="venue" required>
             </div>
+            <div class="mb-3 col-md-6">
+                <label for="cancellationFee" class="form-label">Cancellation Fee</label>
+                <input type="number" class="form-control" id="cancellationFee" v-model="cancellationFee" required>
+            </div>
             <div class="mb-3 col-md-3">
                 <p> Event Type </p>
                 <select v-model="eventType" class="w-100">
@@ -122,11 +126,12 @@
                     eventName: "",
                     venue: "",
                     eventDateTime: "",
-                    ticketPrice: 0.0,
-                    totalTickets: 0,
+                    ticketPrice: null,
+                    totalTickets: null,
                     availableTickets: "",
                     eventType: "",
                     eventState: "",
+                    cancellationFee: null
                 }
             },
 
@@ -148,6 +153,7 @@
                         "totalTickets":this.totalTickets,
                         "availableTickets": this.totalTickets,
                         "eventType": this.eventType,
+                        "cancellationFee": this.cancellationFee
                     }
 
                     console.log(dataInput)

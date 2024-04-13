@@ -66,6 +66,7 @@ public class BookingController {
     }
 
     @GetMapping(value = "/event/{eventId}")
+    @CrossOrigin
     @PreAuthorize("hasRole('EVENT_MANAGER') or hasRole('TICKET_OFFICER') or hasRole('CUSTOMER')")
     public ResponseEntity<?> getBookingByEvent(@PathVariable long eventId) throws BadRequestException,
             EntityDoesNotExistException {

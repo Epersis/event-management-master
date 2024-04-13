@@ -258,7 +258,7 @@
                             </p>
                             <p class="details"> <span class="header"> Venue :</span> {{ booking.event.venue }} </p>
                             <p class="details"> <span class="header"> Ticket Quantity :</span> {{ booking.numberOfTickets }} </p>
-                            <p class="details"> <span class="header"> Ticket-ID :</span> {{booking.ticketIds}}</p>
+                            <p class="details"> <span class="header"> Ticket-ID :</span> {{ booking.ticketIds }}</p>
                             <p class="details"> <span class="header"> Price :</span> ${{ booking.event.ticketPrice }} </p>
                             <p class="details fw-bold"> <span class="header"> Booking Status : </span>
                                 <span v-if="booking.bookingStatus == 'ACCEPTED'" class="text-success"> {{ booking.bookingStatus }} </span>
@@ -562,6 +562,23 @@
                         });
 
                         Promise.all(promises).then(bookings => {
+
+                            for (booking of bookings) {
+                                let ticketIds = "";
+                                let tickets = booking.tickets;
+                                for (i = 0; i < tickets.length; i++) {
+                                    if (i != tickets.length-1) {
+                                        ticketIds += `${tickets[i].id}, `
+                                    }
+                                    else {
+                                        ticketIds += `${tickets[i].id}`
+                                    }
+                                    
+                                }
+                                booking['cancellationFee'] = booking.numberOfTickets * booking.event.cancellationFee
+                                booking['ticketIds'] = ticketIds;
+                            }
+
                             bookings = bookings.filter(booking => booking !== null);
 
                             this.display_bookings = bookings

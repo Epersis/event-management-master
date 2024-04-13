@@ -121,9 +121,10 @@
                 if (!response.ok) {
                     document.getElementById("failure").setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
-                    console.log("admitted bfr")
+                    console.log(response)
                 }
                 else {
+                    this.ticketID = null
                     document.getElementById("success").setAttribute("style", "display: inline-flex")
                     document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                 }
