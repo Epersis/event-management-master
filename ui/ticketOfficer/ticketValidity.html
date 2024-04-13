@@ -71,22 +71,10 @@
     </div>
     </div>
 
-    <div class="container pop-up align-items-center justify-content-center" id="success">
-        <div class="card shadow-sm m-1 w-auto">
+    <div class="container pop-up align-items-center justify-content-center" id="popUp">
+        <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
-                <div class="mb-4 title text-center"> Ticket has been successfully admitted! </div>
-                <div class="justify-content-center align-items-center d-flex">
-                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-
-    <div class="container pop-up align-items-center justify-content-center" id="failure">
-        <div class="card shadow-sm m-1 w-auto">
-            <div class="card-body">
-                <div class="mb-1 title text-center"> Failed to admit ticket </div>
+                <div class="mb-1 title text-center"> {{ header }} </div>
                 <p class="details mb-1 text-center"> {{ body }} </span></p>
                 <div class="justify-content-center align-items-center d-flex">
                     <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="close()"> Ok </button>
@@ -96,14 +84,14 @@
         </div>
     </div>
 
-
     <script>
     const app = Vue.createApp({
 
         data () {
         return {
             ticketID: null,
-            body: ""
+            body: "",
+            header: ""
         }
         },
 
@@ -114,24 +102,16 @@
                 console.log(token)
                 console.log(this.ticketID)
 
-                fetch(`http://localhost:8081/api/v1/tickets/admit/${this.ticketID}`, {
-                    method: "PUT",
+                fetch(`http://localhost:8081/api/v1/tickets/check_validity/${this.ticketID}`, {
                     headers: {
                         'Authorization': 'Bearer ' + token
                     }
                 })
                 .then(response => {
-                    // console.log(response.text())
-                    if (response.ok) {
-                        document.getElementById("success").setAttribute("style", "display: inline-flex")
-                        document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
-
+                    if (!response.ok) {
+                        throw new Error("error")
                     }
-                    else {
-                        document.getElementById("failure").setAttribute("style", "display: inline-flex")
-                        document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
-                        return response.json()
-                    }
+                    console.log(response)
                     return response.json()
                     
                 })
@@ -141,8 +121,20 @@
                         this.body = "Ticket does not exist."
                     }
                     else {
-                        this.body = data.errorMessage
+                        this.body = data.message
                     }
+
+                    if (data.validity) {
+                        this.header = "Ticket is valid"
+                        this.body = ""
+                    }
+                    else {
+                        this.header = "Ticket is invalid"
+                    }
+
+                    document.getElementById("popUp").setAttribute("style", "display: inline-flex")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+
                     
                 })
                 .catch(error => {
@@ -165,9 +157,9 @@
 
             close() {
                 this.body = ""
+                this.header = ""
                 this.ticketID = null
-                document.getElementById("success").setAttribute("style", "display: none")
-                document.getElementById("failure").setAttribute("style", "display: none")
+                document.getElementById("popUp").setAttribute("style", "display: none")
                 document.getElementById("overlay").setAttribute("style", "opacity: 1")
             },
 

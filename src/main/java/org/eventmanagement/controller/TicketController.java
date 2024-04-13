@@ -35,14 +35,64 @@ public class TicketController {
     @Autowired
     private EventController eventController;
 
-    @GetMapping("/get_status/{ticketId}")
+    @GetMapping("/check_validity/{ticketId}")
+    @CrossOrigin
     @PreAuthorize("hasRole('TICKET_OFFICER')")
-    public ResponseEntity<String> getTicketStatus(@PathVariable long ticketId) {
+    public ResponseEntity<?> getTicketStatus(@PathVariable long ticketId) {
+        // try {
+        //     String ticketStatus = ticketService.getTicketStatus(ticketId);
+        //     return ResponseEntity.ok(ticketStatus);
+        // } catch (EntityDoesNotExistException e) {
+        //     return ResponseEntity.notFound().build();
+        // }
+
         try {
-            String ticketStatus = ticketService.getTicketStatus(ticketId);
-            return ResponseEntity.ok(ticketStatus);
+            String message = null;
+            
+
+            // 1. check for booking validity
+            // 2. check for event validity (active, today, ongoing)
+            // 3. check for ticket validity (if alr active)
+
+            boolean ticketValidity = (ticketService.getTicketStatus(ticketId) == "INACTIVE");
+            boolean isBookingValid = ticketService.isBookingValid(ticketId);
+            boolean isEventCompleted = ticketService.isEventCompleted(ticketId);
+            boolean isEventCancelled = ticketService.isEventCancelled(ticketId);
+            boolean isTicketEventDateToday = ticketService.isTicketEventDateToday(ticketId);
+            boolean isTicketEventTimeOverdue = ticketService.isTicketEventTimeOverdue(ticketId);
+
+            if (ticketValidity) {
+                message = "Ticket is valid.";
+            }
+
+            //check for valid booking 
+            else if (!isBookingValid) {
+                message = "Booking is not active.";
+            }
+
+            // Check if the event is active
+            else if (isEventCompleted) {
+                message = "Event is over.";
+            }
+
+            else if (isEventCancelled) {
+                message = "Event has been cancelled.";
+            }
+
+            else {
+                message = "Ticket has already been admitted.";
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("validity", ticketValidity);
+            response.put("message", message);
+            
+            return ResponseEntity.ok(response);
+
         } catch (EntityDoesNotExistException e) {
-            return ResponseEntity.notFound().build();
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -88,8 +138,7 @@ public class TicketController {
             // Check if the event has already begun
             else if (!isTicketEventTimeOverdue) {
                 errorMessage.append("Event has already begun.");
-            }
-            
+            }            
 
             if (errorMessage.length() > 0) {
                 Map<String, Object> response = new HashMap<>();

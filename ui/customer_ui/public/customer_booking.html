@@ -93,13 +93,13 @@
                             </p>
                             
                             <p v-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
-                                Booking was cancelled.
+                                Booking was cancelled
                             </p>
                             <p v-else-if="checkBookingValidity(booking)" class="details fw-bold"> 
-                                Tickets have been admitted.
+                                Tickets have been admitted
                             </p>
                             <p v-else-if="isWithin48h(booking.event.eventDateTime) " class="details error-text"> 
-                                Cannot cancel booking less than 2 days before the event.
+                                Cannot cancel booking less than 2 days before the event
                             </p>
                             <!-- <p v-else-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
                                 Event has been {{ booking.event.eventState.toLowerCase() }}.
@@ -502,6 +502,8 @@
                 },
                 
                 close() {
+                    this.body = ""
+                    this.message = ""
                     document.getElementById("popUp").setAttribute("style", "display: none")
                     document.getElementById("overlay").setAttribute("style", "opacity: 1")
                     location.reload();

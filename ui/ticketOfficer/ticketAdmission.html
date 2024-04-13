@@ -51,7 +51,7 @@
 
     <div class="container-fluid page-header ticket-header mb-5 wow fadeIn" data-wow-delay="0.1s" style="visibility: visible; animation-delay: 0.1s; animation-name: fadeIn;">
       <div class="container">
-          <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Ticket Validation </h1>
+          <h1 class="display-3 mb-3 text-white fw-bold text-center slideInDown" data-wow-delay="0.5s"> Event Admission </h1>
       </div>
     </div>
 
@@ -65,14 +65,14 @@
                 <input type="number" class="form-control my-3" v-model="ticketID">
                 <br>
                 <br>
-                <button @click="checkValidity()" class="btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5"> Validate Ticket </button>
+                <button @click="admit()" class="btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5"> Admit Ticket </button>
             </div>
         </div>
     </div>
     </div>
 
     <div class="container pop-up align-items-center justify-content-center" id="success">
-        <div class="card shadow-sm m-1 w-auto">
+        <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
                 <div class="mb-4 title text-center"> Ticket has been successfully admitted! </div>
                 <div class="justify-content-center align-items-center d-flex">
@@ -84,7 +84,7 @@
     </div>
 
     <div class="container pop-up align-items-center justify-content-center" id="failure">
-        <div class="card shadow-sm m-1 w-auto">
+        <div class="card shadow-sm m-1 w-50">
             <div class="card-body">
                 <div class="mb-1 title text-center"> Failed to admit ticket </div>
                 <p class="details mb-1 text-center"> {{ body }} </span></p>
@@ -108,7 +108,7 @@
         },
 
     methods: {
-        checkValidity() {
+        admit() {
 
                 token = localStorage.getItem("to_token")
                 console.log(token)
