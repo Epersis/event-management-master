@@ -91,7 +91,10 @@
                                 <span v-else-if="booking.event.eventState == 'CANCELLED'" class="text-danger"> {{ booking.event.eventState }} </span>
                                 <span v-else class="text-warning"> {{ booking.event.eventState }} </span>
                             </p>
-                            <p v-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
+                            <p v-if="isWithin48h(booking.event.eventDateTime) " class="details fw-bold"> 
+                                Cannot cancel booking 48h before event.
+                            </p>
+                            <p v-else-if="booking.event.eventState != 'ACTIVE' " class="details fw-bold"> 
                                 Event has been {{ booking.event.eventState.toLowerCase() }}.
                             </p>
                             <p v-else-if="booking.bookingStatus == 'CANCELLED' " class="details error-text fw-bold"> 
@@ -100,7 +103,7 @@
                             <p v-else-if="booking.tickets[0].ticketState == 'ACTIVE' " class="details fw-bold"> 
                                 Tickets have been admitted.
                             </p>
-                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'ACTIVE'"> Cancel Booking </button>
+                            <button class="btn neg-btn rounded-pill w-100 mt-3" @click="cfmCancel(booking.bookingId)" :disabled="booking.event.eventState != 'ACTIVE' || booking.bookingStatus != 'ACCEPTED' || booking.tickets[0].ticketState == 'ACTIVE' || isWithin48h(booking.event.eventDateTime)"> Cancel Booking </button>
                         </div>
                     </div>
                 </div>
@@ -434,6 +437,25 @@
 
 
                 },  
+
+                isWithin48h(checkTime) {
+
+                    // Convert eventDateTime to a JavaScript Date object
+                    const eventDate = new Date(checkTime);
+
+                    // Get the current date and time
+                    const currentDate = new Date();
+
+                    // Calculate the difference in milliseconds between eventDateTime and the current time
+                    const timeDifference = eventDate.getTime() - currentDate.getTime();
+
+                    // Convert the time difference to hours
+                    const hoursDifference = timeDifference / (1000 * 3600);
+
+                    // Return true if the event is less than 24 hours away, otherwise false
+                    return hoursDifference <= 48;
+
+                }, 
 
                 cfmCancel(bookingId) {
                     let booking = this.display_bookings.find(booking => booking.bookingId === bookingId)

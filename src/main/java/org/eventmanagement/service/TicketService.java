@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.eventmanagement.converter.ObjectConverter;
 import org.eventmanagement.dto.EventDto;
@@ -36,10 +38,14 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import org.eventmanagement.enums.EventState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 @Transactional
 public class TicketService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TicketService.class);
 
     @Autowired
     private ObjectConverter objectConverter;
@@ -136,6 +142,7 @@ public class TicketService {
         Event event = eventOptional.get();
         Date eventDate = event.getEventDateTime();
 
+
         // Convert Date to LocalDateTime
         LocalDateTime eventLocalDateTime = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
@@ -167,8 +174,21 @@ public class TicketService {
 
         Date eventDate = event.getEventDateTime();
 
+        // Convert the Date to Instant
+        Instant instant = eventDate.toInstant();
+
+        // Subtract 8 hours using Duration
+        Instant updatedInstant = instant.minus(Duration.ofHours(8));
+
+        // Convert the updated Instant back to Date
+        Date updatedEventDate = Date.from(updatedInstant);
+
         // Convert Date to LocalDateTime
-        LocalDate eventLocalDate = eventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate eventLocalDate = updatedEventDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+        LOGGER.info("event Date: {}", eventDate);
+        LOGGER.info("current Date: {}", currentDate);
+        LOGGER.info("event Date: {}", eventLocalDate);
 
         // Check if the event's date and time is the same or after the current date and time
         return currentDate.isEqual(eventLocalDate);
