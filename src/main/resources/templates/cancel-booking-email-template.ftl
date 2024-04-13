@@ -8,20 +8,20 @@
 <body>
 <h1>Cancel Booking Confirmation</h1>
 
-<p>Dear,</p>
+<p>Hi there!</p>
 
-<p>Your booking for the event "${eventname}" scheduled at ${eventdate} on ${eventvenue} venue has been successfully canceled as per your request.</p>
+<p>Your booking for the event "${eventname}" scheduled at ${eventdate} on ${eventvenue} venue has been successfully cancelled.</p>
 
 <p>Your booking details:</p>
 
 <p><strong>Booking ID:</strong> ${bookingid}</p>
 <p><strong>Number of Tickets:</strong> ${bookingNumTickets}</p>
 
-<p>If you have any further questions or need assistance, please feel free to reach out to us.</p>
+<p>We're sorry to see you go. If you have any questions, feedback or need any further assistance, please feel free to reach out to us!</p>
 
-<p>We look forward to serving you in the future.</p>
+<p>We hope to see you again!</p>
 
 <p>Best regards,</p>
-<p>The Event Management Team</p>
+<p>Ticket.ly Management Team</p>
 </body>
 </html>

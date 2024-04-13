@@ -34,7 +34,7 @@
 <body>
 <h1>Event Booking Confirmation</h1>
 
-<p>Dear,</p>
+<p>Hello!</p>
 
 <p>We're thrilled to confirm your booking for the upcoming event:</p>
 
@@ -42,15 +42,15 @@
 <p><strong>Date:</strong> ${eventdate}</p>
 <p><strong>Location:</strong> ${eventvenue}</p>
 
-<p>Please find the details of your booking below:</p>
+<p>The details of your booking are as follows:</p>
 
 <p><strong>Booking ID:</strong> ${bookingid}</p>
 <p><strong>Number of Tickets:</strong> ${bookingNumTickets}</p>
 <p><strong>Ticket IDs:</strong> ${ticketIds}</p>
 
-<p>Thank you for choosing to attend our event. We look forward to seeing you there!</p>
+<p>Get excited for your event and see you real soon!</p>
 
-<p>Best regards,</p>
-<p>The Event Management Team</p>
+<p>Cheers,</p>
+<p>Ticket.ly Management Team</p>
 </body>
 </html>
