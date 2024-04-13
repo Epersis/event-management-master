@@ -576,6 +576,45 @@
                             bookings = bookings.filter(booking => booking !== null);
 
                             this.display_bookings = bookings
+
+                            this.display_bookings.sort((a, b) => {
+
+                                const stateOrder = {
+                                    'ACTIVE': 1,
+                                    'INACTIVE': 0
+                                }
+
+                                const state1 = stateOrder[a.tickets[0].ticketState];
+                                const state2 = stateOrder[b.tickets[0].ticketState];
+
+                                if (state1 != state2) {
+                                    return state1 - state2;
+                                }
+
+                                const stateOrder1 = {
+                                    'ACCEPTED': 3,
+                                    'PENDING': 2,
+                                    'FAILED': 1,
+                                    'CANCELLED': 0
+                                }
+
+                                const stateA = stateOrder1[a.bookingStatus];
+                                const stateB = stateOrder1[b.bookingStatus];
+
+                                if (stateA != stateB) {
+                                    return stateA - stateB
+                                }
+
+                                if (a.bookingDateTime < b.bookingDateTime) {
+                                    return 1; // a should come before b
+                                } else if (a.bookingDateTime > b.bookingDateTime) {
+                                    return -1; // b should come before a
+                                } else {
+                                    return 0; // booking dates are equal
+                                }
+
+                            })
+
                             
                         });
                         console.log(this.display_bookings)

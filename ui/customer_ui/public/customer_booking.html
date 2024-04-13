@@ -317,22 +317,20 @@
 
                             this.display_bookings.push(...this.completedBookings)
                             this.display_bookings.push(...this.upcomingBookings)
-                            
+
                             this.display_bookings.sort((a, b) => {
 
-
-                                const stateOrder1 = {
-                                    'ACTIVE': 0,
-                                    'INACTIVE': 1
+                                const stateOrder = {
+                                    'ACTIVE': 1,
+                                    'INACTIVE': 0
                                 }
 
-                                const stateA = stateOrder1[a.tickets[0].ticketState];
-                                const stateB = stateOrder1[b.tickets[0].ticketState];
+                                const state1 = stateOrder[a.tickets[0].ticketState];
+                                const state2 = stateOrder[b.tickets[0].ticketState];
 
-                                if (stateA != stateB) {
-                                    return stateA - stateB;
+                                if (state1 != state2) {
+                                    return state1 - state2;
                                 }
-                            
 
                                 const stateOrder2 = {
                                     'ACTIVE': 0,
@@ -342,10 +340,35 @@
 
                                 const stateC = stateOrder2[a.event.eventState];
                                 const stateD = stateOrder2[b.event.eventState];
-                                return stateC - stateD;
-
                                 
+                                if (stateC != stateD) {
+                                    return stateC - stateD;
+                                }
+
+                                const stateOrder1 = {
+                                    'ACCEPTED': 0,
+                                    'PENDING': 1,
+                                    'FAILED': 2,
+                                    'CANCELLED': 3
+                                }
+
+                                const stateA = stateOrder1[a.bookingStatus];
+                                const stateB = stateOrder1[b.bookingStatus];
+
+                                if (stateA != stateB) {
+                                    return stateA - stateB
+                                }
+
+                                if (a.bookingDateTime < b.bookingDateTime) {
+                                    return 1; // a should come before b
+                                } else if (a.bookingDateTime > b.bookingDateTime) {
+                                    return -1; // b should come before a
+                                } else {
+                                    return 0; // booking dates are equal
+                                }
+
                             })
+                            
                             
                             console.log(this.display_bookings);
                         });
