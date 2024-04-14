@@ -7,6 +7,7 @@ This event management project is spring boot based implementation project which 
 - Download the Java 17 and configured.
 - Download the Apache Maven from https://maven.apache.org/download.cgi site.
 - Unzip the Apache Maven in any folder.
+- Please change the path in the compile.bat file to where apache maven is installed on your local system
 - Run the `compile.bat` command.
 - in mysql, username should be "root" and password is empty.
 - Go to `target` directory.
