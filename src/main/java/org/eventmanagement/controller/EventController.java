@@ -129,7 +129,7 @@ public class EventController {
         EventDto eventDto = eventOptional.get();
         double ticketPrice = eventDto.getTicketPrice();
         int ticketsSold = eventService.calculateTicketsSold(eventId);
-        double revenue = ticketPrice * ticketsSold;
+        double revenue = ticketPrice * ticketsSold + eventDto.getCancellationFeeRevenue();
 
         return ResponseEntity.ok(revenue);
 

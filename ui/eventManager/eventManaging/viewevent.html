@@ -153,11 +153,8 @@
                     <span class="header"> Tickets Sold :</span> 
                     <input type="number" class="form-control my-3" id="ticketsSold" v-model="ticketsSold" required>
                 </p> 
-                <p class="details mb-1"> <span class="header"> Tickets Available :</span> </p>
-                <p class="details mb-1 my-3"> 
-                    <span class="header"> Ticket Price :</span>
-                    <input type="number" class="form-control my-3" id="ticketPrice" v-model="ticketPrice" required>
-                </p>
+                <p class="details mb-1"> <span class="header"> Tickets Available : </span> {{ availableTickets }} </p>
+                <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice.toFixed(2) }} </p>
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Cancellation Fee :</span>
                     <input type="number" class="form-control my-3" id="cancellationFee" v-model="cancellationFee" required>
@@ -405,6 +402,7 @@
                         this.eventType = data.eventType
                         this.eventState = data.eventState
                         this.cancellationFee = data.cancellationFee
+                        this.cancellationFeeRevenue = data.cancellationFeeRevenue
 
                         dateTimeRaw = data.eventDateTime
                         this.eventDateTime = dateTimeRaw
@@ -552,6 +550,9 @@
                         return response.json();
                     })
                     .then(data => {     
+                        console.log(data)
+
+
                         const promises = data.map(booking => {
                             booking['event'] = this.event
                             return booking
@@ -571,9 +572,9 @@
                                     }
                                     
                                 }
-                                if (booking.bookingStatus == "CANCELLED") {
-                                    this.cancellationFeeRevenue += booking.cancellationFee;
-                                }
+                                // if (booking.bookingStatus == "CANCELLED") {
+                                //     this.cancellationFeeRevenue += booking.cancellationFee;
+                                // }
 
                                 booking['ticketIds'] = ticketIds;
                             }
@@ -666,7 +667,6 @@
                         "name",
                         "venue",
                         "eventDateTime",
-                        "ticketPrice",
                         "totalTickets",
                         "eventType",
                         "cancellationFee"
@@ -676,6 +676,7 @@
 
                     dataInput["availableTickets"] = document.getElementById("totalTickets").value - document.getElementById("ticketsSold").value
                     dataInput["attendanceCount"] = this.attendanceCount
+                    dataInput["ticketPrice"] = this.ticketPrice
 
                     for (iter of toIterate) {
                         console.log(iter)

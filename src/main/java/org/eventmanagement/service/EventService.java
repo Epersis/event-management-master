@@ -181,7 +181,8 @@ public class EventService {
             Event event = savedEvent.get();
             int ticketsSold = event.getTicketsSold();
             double ticketPrice = event.getTicketPrice();
-            return ticketPrice * ticketsSold;
+            double cancellationFeeRevenue = event.getCancellationFeeRevenue();
+            return ticketPrice * ticketsSold - cancellationFeeRevenue;
         } else {
             throw new EventNotFoundException("Event with ID " + eventId + " not found");
         }

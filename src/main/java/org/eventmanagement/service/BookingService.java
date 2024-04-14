@@ -398,7 +398,11 @@ public class BookingService {
 
         }
 
+        int numberOfTickets = booking.getNumberOfTickets();
+        double cancellationFee = event.getCancellationFee();
+
         event.setAvailableTickets(event.getAvailableTickets() + booking.getNumberOfTickets());
+        event.setCancellationFeeRevenue(event.getCancellationFeeRevenue() + (numberOfTickets * cancellationFee));
         this.eventRepository.saveAndFlush(event);
 
         Booking updatedBooking = this.bookingRepository.save(booking);
