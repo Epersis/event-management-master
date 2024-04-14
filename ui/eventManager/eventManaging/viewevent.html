@@ -154,9 +154,7 @@
                     <span class="header"> Total Tickets :</span> 
                     <input type="number" class="form-control my-3" id="totalTickets" v-model="totalTickets" required> 
                 </p>
-                <p class="details mb-1 my-3"> 
-                    <span class="header"> Tickets Sold :</span> 
-                    <input type="number" class="form-control my-3" id="ticketsSold" v-model="ticketsSold" required>
+                <p class="details mb-1 my-3"> <p class="details mb-1"> <span class="header"> Tickets Sold :</span> {{ ticketsSold }} </p> 
                 </p> 
                 <p class="details mb-1"> <span class="header"> Tickets Available : </span> {{ availableTickets }} </p>
                 <p class="details mb-1"> <span class="header"> Ticket Price :</span> ${{ ticketPrice.toFixed(2) }} </p>
@@ -174,6 +172,8 @@
              
                
         </div>
+
+
         <div class="row mx-2 mb-5 justify-content-center text-white">
 
             <!-- Event date update validation: comment line 182, uncomment line 186-->
@@ -689,7 +689,7 @@
 
                     dataInput = {}
 
-                    dataInput["availableTickets"] = document.getElementById("totalTickets").value - document.getElementById("ticketsSold").value
+                    dataInput["availableTickets"] = document.getElementById("totalTickets").value - this.ticketsSold
                     dataInput["attendanceCount"] = this.attendanceCount
                     dataInput["ticketPrice"] = this.ticketPrice
 

@@ -23,11 +23,19 @@ This event management project is spring boot based implementation project which 
 
 
 ## Note:
-The application may lag at times, please be patient. Thank you! \n\n
+The application may lag at times, please be patient. Thank you!
 
-** Currently the creation and updating of events allows for events to be edited and updated in the past. This is because validation is not implemented for testing reasons, but it is commented out if you would like to test it in the following files: \n
-/ui/eventManager/eventManaging/addevent.html: lines 77 & 109-110 \n
-/ui/eventManager/eventManaging/viewevent.html: lines 135 & 182
+
+
+** Currently the creation and updating of events allows for events to be edited and updated to be set in the past. This is because validation has been disabled for testing reasons, but it is commented out if you would like to test it in the following files:
+- `/ui/eventManager/eventManaging/addevent.html`: 
+    + uncomment lines 77 & 112-114
+    + comment lines 107-109
+- `/ui/eventManager/eventManaging/viewevent.html`: 
+    + uncomment lines 135 & 186
+    + comment line 182
+
+
 
 
 
