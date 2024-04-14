@@ -15,7 +15,7 @@ This event management project is spring boot based implementation project which 
 
 2. Users' Interface
 - Download and install node.js
-- Run `ui_run.bat` command to start the front-end of the application, which is hosted on localhost:3000
+- Run `ui_run.bat` command on another terminal to start the front-end of the application, which is hosted on localhost:3000
 - Below are the login pages of the different user types:
     + Customer: `http://localhost:3000/customer-login`
     + Event Manger: `http://localhost:3000/event-manager-login`
