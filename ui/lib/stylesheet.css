@@ -190,6 +190,10 @@
     color: #4D0015;
 }
 
+.error-text-light {
+    color: #ab012e;
+}
+
 a {
     color: inherit;
     text-decoration: none;

@@ -70,6 +70,13 @@
             <div class="mb-3 col-md-6">
                 <label for="dateTime" class="form-label">Date & Time </label>
                 <input type="datetime-local" class="form-control" id="dateTime" v-model="eventDateTime" required>
+               
+                
+                <!-- Event date creation validation -->
+                
+                <!-- <p v-if="new Date(eventDateTime) < new Date()" class="details my-1 error-text-light"> Date unavailable </p> -->
+
+
             </div>
             <div class="mb-3 col-md-6">
                 <label for="totalTickets" class="form-label">Total Tickets</label>
@@ -96,10 +103,14 @@
             <div class="mb-3 col-md-3 align-items-end justify-content-end d-flex">
                 <button class="mx-1 btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5" @click="createEvent()"> Create </button>
             </div>
+
+            <!-- Event date creation validation -->
+
+            <!-- <div class="mb-3 col-md-3 align-items-end justify-content-end d-flex">
+                <button class="mx-1 btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5" @click="createEvent()" :disabled="new Date(eventDateTime) < new Date()"> Create </button>
+            </div> -->
+
         </div>
-        <!-- <div class="row mx-2 mb-5 justify-content-center">
-            <button class="col-12 col-md-4 mx-1 btn neg-btn rounded-pill"> Add Event </button>
-        </div> -->
 
     </div>
     </div>

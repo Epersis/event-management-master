@@ -129,6 +129,11 @@
                 <p class="details mb-1 my-3"> 
                     <span class="header"> Date & Time :</span>
                     <input type="datetime-local" class="form-control my-3" id="eventDateTime" v-model="eventDateTime" required>  
+
+                    <!-- Event date update validation -->
+                
+                    <!-- <p v-if="new Date(eventDateTime) < new Date()" class="details my-1 error-text-light"> Date unavailable </p> -->
+
                 </p> 
                 <p class="details mb-1 my-3">
                     <span class="header"> Event Type :</span>
@@ -169,9 +174,15 @@
              
                
         </div>
-        <div class="row mx-2 mb-5 justify-content-center">
-            <button class="col-6 mx-5 my-3 btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="checkChange('update')"> Update Event </button>
-            <button class="col-6 mx-5 my-3 btn neg-btn rounded-pill w-25 fs-5 fw-medium w-auto px-5" @click="cancelUpdate()"> Cancel Changes </button>
+        <div class="row mx-2 mb-5 justify-content-center text-white">
+            <button class="col-6 mx-5 my-3 btn rounded-pill fs-5 fw-medium w-auto px-5" @click="checkChange('update')"> Update Event </button>
+
+            <!-- Event date update validation -->
+
+            <!-- <button class="col-6 mx-5 my-3 btn rounded-pill fs-5 fw-medium w-auto px-5" @click="checkChange('update')" :disabled="new Date(eventDateTime) < new Date()"> Update Event </button> -->
+
+
+            <button class="col-6 mx-5 my-3 btn neg-btn rounded-pill fs-5 fw-medium w-auto px-5" @click="cancelUpdate()"> Cancel Changes </button>
         </div>
         
     </div>
