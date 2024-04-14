@@ -8,7 +8,7 @@ This event management project is spring boot based implementation project which 
 - Download the Apache Maven from https://maven.apache.org/download.cgi site.
 - Unzip the Apache Maven in any folder.
 - Please change the path in the compile.bat file to where apache maven is installed on your local system
-- Create a database titled "eventdb" in phpMyAdmin, which will be populated with tables after running `compile.bat`.
+- Please create a schema called eventdb in mysql
 - Run the `compile.bat` command.
 - In mysql, username should be "root" and password is empty.
 - Go to `target` directory.

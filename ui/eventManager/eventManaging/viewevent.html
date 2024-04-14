@@ -130,7 +130,7 @@
                     <span class="header"> Date & Time :</span>
                     <input type="datetime-local" class="form-control my-3" id="eventDateTime" v-model="eventDateTime" required>  
 
-                    <!-- Event date update validation -->
+                    <!-- Event date update validation: uncomment line 135 -->
                 
                     <!-- <p v-if="new Date(eventDateTime) < new Date()" class="details my-1 error-text-light"> Date unavailable </p> -->
 
@@ -175,10 +175,14 @@
                
         </div>
         <div class="row mx-2 mb-5 justify-content-center text-white">
+
+            <!-- Event date update validation: comment line 182, uncomment line 186-->
+            
+            <!-- comment line 182: -->
             <button class="col-6 mx-5 my-3 btn rounded-pill fs-5 fw-medium w-auto px-5" @click="checkChange('update')"> Update Event </button>
 
-            <!-- Event date update validation -->
 
+            <!-- uncomment line 186: -->
             <!-- <button class="col-6 mx-5 my-3 btn rounded-pill fs-5 fw-medium w-auto px-5" @click="checkChange('update')" :disabled="new Date(eventDateTime) < new Date()"> Update Event </button> -->
 
 
