@@ -1,2 +1,2 @@
 @echo off
-"C:\Users\Persis Evangeline\Downloads\apache-maven-3.9.6\bin\mvn" clean install -DskipTests
+"C:\wamp64\www\oop\updated\apache-maven-3.9.6\bin\mvn" clean install -DskipTests
