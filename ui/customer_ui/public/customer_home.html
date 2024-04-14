@@ -121,8 +121,9 @@
                         <p class="details mb-1">
                             <span class="header"> Number of Tickets :</span>
                             <input type="number" class="form-control my-3" id="ticketQuantity" v-model="ticketQuantity" required min="1" max="5">
-                            <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets. </p>
-                            <p v-else-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets. </p>
+                            <p v-if="ticketQuantity > event.availableTickets" class="details mb-1 error-text"> You can only purchase a maximum of {{ event.availableTickets }} tickets </p>
+                            <p v-else-if="ticketQuantity > 5" class="details mb-1 error-text"> You can only purchase a maximum of 5 tickets </p>
+                            <p v-else-if=" ticketQuantity*event.ticketPrice > walletBalance" class="details mb-1 error-text"> Insufficient funds in wallet </p>
                             <p v-else-if="errorMessage != ''" class="details mb-1 error-text"> {{ errorMessage }} </p>
                         </p>
                     </form>
@@ -130,7 +131,7 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5 || ticketQuantity > event.availableTickets || isWithin24h(event.eventDateTime)">Buy Ticket</button>
+                    <button type="button" class="btn rounded-pill w-auto mt-3 px-5 d-inline" @click="processTicketsPurchase(event)" :disabled="ticketQuantity > 5 || ticketQuantity > event.availableTickets || isWithin24h(event.eventDateTime) || (ticketQuantity*event.ticketPrice > walletBalance) ">Buy Ticket</button>
                     <button type="button" class="btn neg-btn rounded-pill w-auto px-5 mt-3 d-inline" @click="closeModal(event)" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -280,6 +281,7 @@
 
                 openModal(event) {
                     this.errorMessage = ""
+                    this.ticketQuantity = 1
                     const modalId = 'modal-' + event.id;
                     const modal = new bootstrap.Modal(document.getElementById(modalId));
                     modal.show();
@@ -319,9 +321,13 @@
                         })
                         .then(response => response.json())
                         .then(data => {
-                            if (data.message != null) {
+                            console.log(data)
+                            if (data.message == "The maximum number of tickets purchased for each event per user is 5!") {
                                 console.log(data.message)
-                                this.errorMessage = "You can only purchase a maximum of 5 tickets per event."
+                                this.errorMessage = "You can only purchase a maximum of 5 tickets per event"
+                            }
+                            else if (data.message == "You can not proceed with booking as wallet amount is lower than booking amount.Booking amount is 1500.0 where as wallet amount is 936.0") {
+                                this.errorMessage = "Insufficient funds in wallet"
                             }
                             else {
                                 console.log('Tickets purchased successfully:', data);
