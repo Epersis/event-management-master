@@ -1,2 +1,2 @@
 @echo off
-mvn clean install -DskipTests
+"C:\Users\Persis Evangeline\Downloads\apache-maven-3.9.6\bin\mvn" clean install -DskipTests
