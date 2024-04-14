@@ -113,6 +113,19 @@
         </div>
     </div>
 
+    <div class="container pop-up align-items-center justify-content-center" id="failure">
+        <div class="card shadow-sm m-1 w-50">
+            <div class="card-body">
+                <div class="mb-1 title text-center"> Failed to add Ticket Officer </div>
+                <p class="details mb-1 text-center"> {{ body }} </span></p>
+                <div class="justify-content-center align-items-center d-flex">
+                    <button class="btn neg-btn rounded-pill w-50 mt-3 d-inline" @click="closeFail()"> Ok </button>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
     <script>
 
         const vm = Vue.createApp({
@@ -125,6 +138,7 @@
                     password: '',
                     cfmPassword: '',
                     mobileNum: '',
+                    body: ""
                 }
             },
 
@@ -153,7 +167,17 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            console.log("got error")
+                            console.log(response)
+                            if (response.status == 409) {
+                                this.body = "Email unavailable"
+                            }
+                            else {
+                                this.body = "Please check details again"
+                            }
+
+                            document.getElementById("failure").setAttribute("style", "display: inline-flex")
+                            document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
+
                             throw new Error("got error")
                         }
                         return response.json()
@@ -164,6 +188,12 @@
                         document.getElementById("overlay").setAttribute("style", "opacity: 0.5")
                     })
 
+                },
+
+                closeFail() {
+                    this.body = ""
+                    document.getElementById("failure").setAttribute("style", "display: none")
+                    document.getElementById("overlay").setAttribute("style", "opacity: 1")
                 },
 
                 close() {
