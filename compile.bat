@@ -1,2 +1,2 @@
 @echo off
-mvn clean install -DskipTests
+"full-path-where-apache-maven-is-installed-on-your-local-system" mvn clean install -DskipTests

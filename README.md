@@ -3,18 +3,23 @@
 This event management project is spring boot based implementation project which is aiming to cover the event management functionality.
 
 ## How to setup or run the project on local system.
-
+1. Backend
 - Download the Java 17 and configured.
 - Download the Apache Maven from https://maven.apache.org/download.cgi site.
 - Unzip the Apache Maven in any folder.
 - Please change the path in the compile.bat file to where apache maven is installed on your local system
-- Please create a schema called eventdb in mysql
+- Please create a schema called `eventdb` in mysql
 - Run the `compile.bat` command.
 - In mysql, username should be "root" and password is empty.
-- Go to `target` directory.
-- There should be a jar `event-management-0.0.1-SNAPSHOT.jar` in `target` directory.
-- Run the command `java -jar event-management-0.0.1-SNAPSHOT.jar` command to start the project the embedded server.
-- Run the command `npm start` command to start the front-end of the application, which is hosted on localhost:3000
+- Run the `run.bat` command to start the application backend.
+
+2. Users' Interface
+- Download and install node.js
+- Run `ui_run.bat` command to start the front-end of the application, which is hosted on localhost:3000
+- Below are the login pages of the different user types:
+    + Customer: `http://localhost:3000/customer-login`
+    + Event Manger: `http://localhost:3000/event-manager-login`
+    + Ticket Officer: `http://localhost:3000/ticket-officer-login`
 
 
 ## Note:
