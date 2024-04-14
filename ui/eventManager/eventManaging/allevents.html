@@ -156,12 +156,12 @@
 
                 logout() {
                     localStorage.removeItem("em_token")
-                    window.location.href = "../../login.html"
+                    window.location.href = "../../em_login.html"
                 },
 
                 checkLogin() {
                     if (!localStorage.getItem("em_token")) {
-                        window.location.href = "../../login.html"
+                        window.location.href = "../../em_login.html"
                         alert("Please login")
                     }
                 },

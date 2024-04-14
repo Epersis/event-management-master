@@ -16,9 +16,19 @@ let stripeGateway = stripe("sk_test_51Ot1e6P0edbtrzURjMHuMeT7O59FMpzCfrObVxw0q5s
 
 let DOMAIN = process.env.DOMAIN;
 
-// Login Route
-app.get('/', (req, res) => {
+// Customer Login Route
+app.get('/customer-login', (req, res) => {
     res.sendFile("login.html", {root: "./"});
+})
+
+// Event Manger Login Route
+app.get('/event-manager-login', (req, res) => {
+    res.sendFile("em_login.html", {root: "./"});
+})
+
+// Ticket Officer Login Route
+app.get('/ticket-officer-login', (req, res) => {
+    res.sendFile("to_login.html", {root: "./"});
 })
 
 //Success Route

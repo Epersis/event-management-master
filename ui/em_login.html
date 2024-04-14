@@ -15,7 +15,7 @@
 
 <body>
     <div id="app" class="container mt-5">
-        <h1>Customer Login</h1>
+        <h1>Event Manager Login</h1>
         <form @submit.prevent="login">
             <div class="row mt-4">
                 <div class="mb-3 col-md-6">
@@ -33,7 +33,7 @@
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
         <br>
-        <h4>New user? <a href="signup.html">Sign Up</a></h4>
+        <h4>New user? <a href="em_signup.html">Sign Up</a></h4>
         <div v-if="errorMessage" class="mt-3 alert alert-danger" role="alert">
             {{ errorMessage }}
         </div>
@@ -61,8 +61,8 @@
 
             methods: {
                 checkLogin() {
-                    if (localStorage.getItem("customer_token")) {
-                        window.location.href = "customer_ui/public/customer_home.html"
+                    if (localStorage.getItem("em_token")) {
+                        window.location.href = "eventManager/index.html";
                     }
                 },
 
@@ -98,13 +98,15 @@
                         console.log(data.role)
                         console.log(data.token)
 
-                        if (data.role == "ROLE_CUSTOMER") {
-                            const customer_token = data['token'];
-                            localStorage.setItem('customer_token', customer_token)
-                            window.location.href = "customer_ui/public/customer_home.html"
+
+                        if (data.role == "ROLE_EVENT_MANAGER") {
+                            //REDIRECT TO EVENT MANAGER PAGE
+                            localStorage.setItem('em_token', data.token)
+                            console.log(localStorage)
+                            window.location.href = "eventManager/index.html"
                         }
                         else {
-                            this.errorMessage = "You are trying to log in as a Customer. Your account is not authorised to access this page!"
+                            this.errorMessage = "You are trying to log in as an Event Manger. Your account is not authorised to access this page!"
                         }
                     })
                     .catch (error => {

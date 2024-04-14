@@ -1,3 +1,9 @@
+// Check login
+if (!localStorage.getItem("customer_token")) {
+    window.location.href = "../../login.html"
+    alert("Please login")
+}
+
 // Back to Homepage
 document.getElementById('back').addEventListener('click', () => {
     window.location.href = 'customer_ui/public/customer_home.html'
